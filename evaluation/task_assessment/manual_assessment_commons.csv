@@ -1,0 +1,33 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Bypass the tutorial and navigate to the Signup page.,FAILURE,SUCCESS,,
+Login to the Commons app using their existing account credentials.,FAILURE,FAILURE,,
+Search for a specific category in the Commons app.,FAILURE,FAILURE,X,
+Upload an image to the Commons app.,FAILURE,SUCCESS,O,
+Confirm the taken image and initiate the upload process.,FAILURE,SUCCESS,,O
+Set a category for the image being uploaded.,SUCCESS,SUCCESS,,
+Proceed to the next step in the image upload process.,SUCCESS,SUCCESS,,O
+"Change the license type of the image being uploaded from ""Attribution-ShareAlike 4.0"" to ""Attribution 3.0"".",FAILURE,SUCCESS,,
+Check the notifications in the Commons app.,SUCCESS,SUCCESS,,
+Check the settings of the Commons app.,SUCCESS,SUCCESS,,
+"Enable the ""Use custom author name"" setting.",SUCCESS,SUCCESS,,
+Manage EXIF Tags in the Settings page to understand what metadata is kept in the uploaded images.,SUCCESS,SUCCESS,,
+Attempt a quiz on the Commons app.,FAILURE,FAILURE,X,
+View and understand the details of the images uploaded by other users in the Commons app.,SUCCESS,SUCCESS,,
+"Find and read the information on the ""About"" page of the Commons app.",SUCCESS,SUCCESS,,
+Share the Commons app with a friend via email.,FAILURE,SUCCESS,,
+Find and take a quiz on the Commons app.,FAILURE,FAILURE,X,
+Bookmark an image from the Explore page.,SUCCESS,SUCCESS,,
+Download an image from the Explore page.,SUCCESS,SUCCESS,,
+Find and complete a quiz on the Commons app.,FAILURE,FAILURE,,
+Locate and explore the Achievements page in the Commons app.,SUCCESS,SUCCESS,,
+Retry fetching the achievements on the Achievements page.,FAILURE,SUCCESS,,
+Explore and interact with the Quiz page.,FAILURE,FAILURE,X,
+Review and rate a recently viewed image from the Explore page.,FAILURE,SUCCESS,X,
+View the saved bookmarks in the Commons app.,SUCCESS,SUCCESS,,
+Share a bookmarked image via email.,FAILURE,SUCCESS,,
+Attempt to find and complete a quiz on the Commons app.,FAILURE,FAILURE,X,
+Upload an image from the device's gallery to the Commons app.,FAILURE,FAILURE,,
+Upload a new image from the device's gallery to the Commons app.,FAILURE,FAILURE,,O
+Find and take a quiz in the Commons app starting from the Explore page.,FAILURE,FAILURE,X,
+"Explore the ""Nearby"" tab on the Main page to discover new places and functionalities.",SUCCESS,SUCCESS,,
+Scroll through the ViewPager on the Main page to explore its contents.,SUCCESS,SUCCESS,,O

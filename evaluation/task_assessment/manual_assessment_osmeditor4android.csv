@@ -1,0 +1,45 @@
+task,agent_determined_result,manual_result,is_possible_task,comment,duplicated
+Read the introduction of the Vespucci app.,SUCCESS,SUCCESS,,,
+Download a map of a specific area using the Vespucci app.,SUCCESS,SUCCESS,,,
+Adjust the application's preferences to enable auto-download of map tiles.,FAILURE,FAILURE,O,,
+Add a new preset in the PresetEditor page.,SUCCESS,SUCCESS,,,
+Adjust the auto-download setting in the AdvancedPrefEditor page.,SUCCESS,SUCCESS,,,
+Add a custom API to the Vespucci app via the APIEditor page.,FAILURE,PARTIALLY,O,Aborted due to length limit,
+Complete adding a custom API on the APIEditor page.,SUCCESS,SUCCESS,,,O
+"Remove the previously added API named ""VespucciAPI"" from the list of APIs.",SUCCESS,SUCCESS,,,
+Modify the URL of the 'OpenStreetMap no https' API from the current 'http://api.openstreetmap.org/api/0.6/' to 'http://custom.osm.org/api/0.6/'.,SUCCESS,SUCCESS,,,
+Navigate to the PropertyEditor page and edit a property of the current element.,FAILURE,FAILURE,O,,
+Modify the maximum distance for notifications in the AdvancedPrefEditor page.,SUCCESS,SUCCESS,,,
+Define a boundary box for a map using the BoxPicker page.,FAILURE,FAILURE,O,,
+Modify the settings for displaying address tags in the AdvancedPrefEditor page.,SUCCESS,SUCCESS,,,
+"Enable the ""Enable name suggestions"" setting in the AdvancedPrefEditor page.",SUCCESS,SUCCESS,,,
+Configure the settings related to tile-based background imagery download and storage in the AdvancedPrefEditor page.,FAILURE,SUCCESS,,,
+"Adjust the ""Max. number of download threads"" setting from ""4 Threads"" to a different value.",SUCCESS,SUCCESS,,,
+Navigate to the DebugInformation page and check the app's performance metrics.,FAILURE,FAILURE,X,,
+Initiate GPS tracking to monitor current location on the map.,SUCCESS,PARTIALLY,O,Pause tracking instead of initiating it,
+Explore and understand the layers functionality of the Vespucci app.,FAILURE,SUCCESS,,,
+Explore and understand the layers functionality in more detail by adding a new layer and adjusting its settings.,SUCCESS,SUCCESS,,,O
+Re-launch the app to view the Splash page.,SUCCESS,FAILURE,X,,
+Add a new OpenStreetMap (OSM) data layer to the map from the Main page.,SUCCESS,SUCCESS,,,
+Use the GeocoderEditor to search for a specific location.,FAILURE,FAILURE,X,,
+Change the map background in the PrefEditor page.,FAILURE,SUCCESS,,,
+"Change the map background to ""Bing aerial imagery"".",SUCCESS,SUCCESS,,,O
+"Enable the ""Keep screen on"" option in the PrefEditor page.",SUCCESS,SUCCESS,,,
+Configure a property of a map element using the PropertyEditor page.,FAILURE,FAILURE,O,,O
+Enable the GPS tracking feature and monitor the current location on the map.,FAILURE,SUCCESS,,,O
+Use the GeocoderEditor page to search for a specific location.,SUCCESS,PARTIALLY,X ,"No geocoderEditor, but searched a specific location",O
+Initiate a data transfer process in the Vespucci app.,FAILURE,SUCCESS,,,
+"Download a specific area of the map for offline use using the ""Download at other location"" function.",FAILURE,SUCCESS,,"Loading state too long, so cancelled automatically",
+Review the Vespucci app's license information on the LicenseViewer page.,SUCCESS,SUCCESS,,,
+Review the privacy policy of the Vespucci app.,SUCCESS,SUCCESS,,,
+Find and navigate to the VespucciURL page from the current HelpViewer page.,FAILURE,FAILURE,O,,
+Filter tags of map elements using the TagFilter page.,FAILURE,SUCCESS,,,
+Upload a local map data to the Vespucci server.,FAILURE,FAILURE,X,,
+Edit a property of a map element on the Main page.,SUCCESS,FAILURE,X,,
+"Interact with the ""Last edited"" property of a map element to understand what information it provides.",FAILURE,FAILURE,X,,
+Edit the property of a map element.,FAILURE,FAILURE,,,O
+Search for a specific location using the GeocoderEditor page.,SUCCESS,PARTIALLY,X,,
+Zoom in and out on the map view on the Main page.,SUCCESS,SUCCESS,,,
+Download a specific area of the map for offline use.,SUCCESS,SUCCESS,,,O
+View the properties of a map element on the Main page.,SUCCESS,SUCCESS,,,
+Explore and interact with more properties of a map element on the Main page.,FAILURE,SUCCESS,,,O

@@ -1,0 +1,46 @@
+task,agent_determined_result,manual_result,is_possible_task,comment,duplicated
+Add a new podcast to the app.,SUCCESS,SUCCESS,O,Subscribed a podcast,
+Mark an episode as played.,FAILURE,FAILURE,O,,
+Add an episode to favorites.,SUCCESS,SUCCESS,O,,
+Play a podcast episode.,SUCCESS,SUCCESS,O,,
+Play a podcast episode and navigate to the Videoplayer page to explore its functionalities.,FAILURE,FAILURE,O,,O
+Sort the podcast episodes.,SUCCESS,Partially,O,Same sort option,
+Access and explore the preference settings of the AntennaPod Debug app.,SUCCESS,FAILURE,O,Podcast settings instead of preference,
+Share a favorite podcast episode through the available sharing options.,SUCCESS,SUCCESS,O,,
+Remove a podcast episode from the queue.,SUCCESS,SUCCESS,O,Moreover it removed podcast,
+Lock the podcast queue from the Main page to prevent any changes.,SUCCESS,SUCCESS,O,,
+Use the search function to find a specific podcast episode.,FAILURE,Partially,O,Too broad search term,
+Report a bug about the search function not yielding expected results.,FAILURE,Partially,O,,
+Download a podcast episode for offline listening.,SUCCESS,SUCCESS,O,,
+Explore the Storage settings of the app to understand how to manage podcast downloads.,FAILURE,SUCCESS,O,,
+Play a podcast episode from the Main page and navigate to the Videoplayer page to explore its functionalities.,SUCCESS,FAILURE,X,Don’t know how to enter video player page,
+"Subscribe to a new podcast using the ""Add Podcast"" option.",SUCCESS,SUCCESS,O,,O
+Visit the website of a podcast episode to explore more content related to computer science.,FAILURE,FAILURE,O,,
+Play a podcast episode and navigate to the Videoplayer page to control the playback.,FAILURE,FAILURE,X,,O
+Import an OPML file containing a list of podcasts.,SUCCESS,FAILURE,O,,
+Rename a podcast in the AntennaPod Debug app.,SUCCESS,SUCCESS,O,,
+"Share a podcast episode using the ""Share…"" functionality on the Main page.",FAILURE,SUCCESS,O,,
+Filter the podcast episodes by a specific criteria and then attempt to download an episode for offline listening.,FAILURE,Partially,O,,
+Download a podcast episode requiring authentication for offline listening.,SUCCESS,FAILURE,O,,O
+Filter the podcast episodes based on their download state to see only downloaded episodes.,SUCCESS,SUCCESS,O,,
+"Adjust the settings of the podcast ""Green's Podcast Journey"".",SUCCESS,SUCCESS,O,,
+Adjust the playback speed of a podcast episode to 1.10.,SUCCESS,SUCCESS,O,,
+Adjust the playback speed of a podcast episode to 1.50.,SUCCESS,SUCCESS,O,,O
+Adjust the playback speed of a podcast episode to 2.00.,FAILURE,Partially,O,,O
+"Enable the ""Auto Skip"" and ""Auto Delete Episode"" functionalities for the ""Green's Podcast Journey"" podcast.",SUCCESS,SUCCESS,O,,
+Change the 'Auto Delete Episode' setting to 'Never'.,SUCCESS,SUCCESS,O,,
+"Adjust the volume reduction setting for the ""Green's Podcast Journey"" podcast.",SUCCESS,SUCCESS,O,,
+"Change the ""Auto Delete Episode"" setting from 'Never' to 'After Playback'.",FAILURE,FAILURE,X,,O
+Change the global default setting for 'Auto Delete Episode' to 'Always'.,SUCCESS,SUCCESS,O,,O
+Play a podcast episode and control the playback from the Videoplayer page.,FAILURE,FAILURE,X,,
+Customize the settings on the WidgetConfig page.,FAILURE,FAILURE,X,,
+"Report a bug about the ""Auto Delete Episode"" setting that is not working as expected.",FAILURE,FAILURE,O,,O
+Download an authenticated podcast episode for offline listening.,FAILURE,SUCCESS,O,,O
+"Play a podcast episode from the Main page, control the playback from the Videoplayer page, and customize the settings on the WidgetConfig page.",FAILURE,FAILURE,X,,O
+Set a sleep timer for the podcast playback.,SUCCESS,SUCCESS,O,,
+Play a podcast episode from the Main page and control its playback using the Videoplayer page.,SUCCESS,FAILURE,X,,O
+Adjust the sleep timer for the podcast playback to 15 minutes.,SUCCESS,Partially,X,,O
+"Enable the ""Shake to reset"", ""Vibrate shortly before end"", and ""Auto-enable"" functionalities in the sleep timer settings.",SUCCESS,SUCCESS,O,,
+Play a video podcast episode and control the playback from the Videoplayer page.,SUCCESS,FAILURE,X,,
+"Enable the ""Skip Silence in Audio"" feature.",SUCCESS,SUCCESS,O,,
+Increase the playback speed of a podcast episode from 2.00x to 2.10x.,SUCCESS,SUCCESS,O,,O

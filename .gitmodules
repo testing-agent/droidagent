@@ -1,0 +1,3 @@
+[submodule "droidbot"]
+	path = droidbot
+	url = ./droidbot

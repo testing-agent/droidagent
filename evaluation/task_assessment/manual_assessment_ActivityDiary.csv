@@ -1,0 +1,39 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Add a new activity to the diary.,SUCCESS,SUCCESS,,
+"Check the statistics of the newly added activity ""Yoga Class"".",SUCCESS,SUCCESS,,
+"Add a detailed note for the ""Yoga Class"" activity.",SUCCESS,SUCCESS,,
+"Add a picture to the ""Yoga Class"" activity.",SUCCESS,SUCCESS,,
+"Add a note to the ""Cinema"" activity.",SUCCESS,SUCCESS,,
+Review the app's privacy policy.,SUCCESS,SUCCESS,,
+"View the location of the ""Yoga Class"" activity on the Map page.",FAILURE,FAILURE,,
+"Navigate to the ""About"" page to read about the app's functionality.",SUCCESS,SUCCESS,,
+Learn to manage activities in the Activity Diary Debug app.,SUCCESS,SUCCESS,,
+Add a new activity and view its history and statistics.,FAILURE,FAILURE,,
+Change the color code of the activity.,SUCCESS,SUCCESS,,
+"View the history and statistics of the ""Jogging"" activity.",FAILURE,FAILURE,O,O
+"Create a new activity named ""Study Group"" with a color of her choice and then view its history and statistics.",SUCCESS,FAILURE,O,O
+"Check the historical data and statistics for the ""Jogging"" activity.",SUCCESS,FAILURE,O,O
+Check the overall statistics of all activities in the app.,SUCCESS,FAILURE,O,
+Navigate to the Statistics page and view the overall statistics of all activities.,SUCCESS,FAILURE,O,O
+Navigate to the History page and review the activity records.,FAILURE,SUCCESS,,
+"Edit the ""Yoga Class"" activity to change its color and add a reminder.",FAILURE,FAILURE,O,
+"Adjust the start and end times of the ""Yoga Class"" activity on the HistoryDetail page.",FAILURE,SUCCESS,O,
+"Adjust the start and end times for the ""Yoga Class"" activity.",SUCCESS,SUCCESS,,O
+"Edit the start and end times of the ""Yoga Class"" activity in the HistoryDetail page.",FAILURE,SUCCESS,,O
+"Change the color of the ""Study Group"" activity.",FAILURE,FAILURE,,O
+"Adjust the start and end times of the ""Study Group"" activity.",FAILURE,SUCCESS,,O
+"Adjust the start and end times of the current activity using the ""Adjust adjacent diary entries"" option.",FAILURE,SUCCESS,,
+"Adjust the start time of the ""Study Group"" activity.",SUCCESS,FAILURE,,O
+"Add a note to the ""Study Group"" activity in the HistoryDetail page.",SUCCESS,SUCCESS,,
+"Edit the end time of the ""Study Group"" activity.",SUCCESS,SUCCESS,,O
+"Navigate to the Statistics page and review the detailed statistics of the ""Jogging"" activity.",SUCCESS,FAILURE,,
+"Check the detailed statistics of the ""Cinema"" activity.",SUCCESS,SUCCESS,,O
+"Add a new activity named ""Gym Workout"" to the Activity Diary Debug app.",SUCCESS,SUCCESS,,O
+"Explore the details and statistics of the newly added ""Gym Workout"" activity.",SUCCESS,FAILURE,,O
+"Search for a specific activity, ""Gym Workout"", using the search function.",SUCCESS,SUCCESS,,
+"Add a picture to the ""Gym Workout"" activity.",SUCCESS,FAILURE,,O
+"Start a ""Relaxing"" activity from the Main page.",SUCCESS,SUCCESS,,
+Adjust the settings of the Activity Diary Debug app to personalize the user experience.,SUCCESS,SUCCESS,,
+Create a backup of the activity data in the Activity Diary Debug app.,FAILURE,FAILURE,,
+Save a backup of the activity data in the Activity Diary Debug app.,FAILURE,FAILURE,,O
+Create a new folder in the Documents page.,FAILURE,FAILURE,X,

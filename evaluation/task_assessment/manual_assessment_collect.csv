@@ -1,0 +1,54 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Start a new form.,FAILURE,FAILURE,X,
+Visit the About page to learn more about the ODK Collect app.,SUCCESS,SUCCESS,O,
+Access the open source libraries/licenses information.,SUCCESS,SUCCESS,O,
+Download a new form into the BlankFormList.,FAILURE,FAILURE,O,
+Download a new form from the FormDownloadList page.,SUCCESS,SUCCESS,O,O
+Navigate back to the MainMenu from the FormDownloadList page.,SUCCESS,SUCCESS,O,
+Delete a form from the list of saved forms.,FAILURE,FAILURE,X,
+Fill out a form that has been previously downloaded.,FAILURE,SUCCESS,O,
+Save the current form as a draft.,SUCCESS,SUCCESS,O,
+"Navigate to a new page by touching the ""Go To Prompt"" button.",SUCCESS,SUCCESS,O,
+"Interact with the ""String number widget"" to understand its functionality.",SUCCESS,SUCCESS,O,
+Upload a completed form to the server.,FAILURE,FAILURE,O,
+Navigate to the FormHierarchy page and explore the different question types.,SUCCESS,SUCCESS,O,
+"Interact with the ""Ex integer widget"" on the FormHierarchy page.",SUCCESS,SUCCESS,O,
+Interact with the 'Image widgets' on the FormHierarchy page.,FAILURE,SUCCESS,O,
+Capture a selfie using the 'Take Picture' button in the FormFilling page.,SUCCESS,FAILURE,O,
+Complete the current form and submit it.,FAILURE,FAILURE,X,
+Successfully capture a selfie on the CaptureSelfie page and save it.,SUCCESS,SUCCESS,O,O
+Explore the 'CaptureSelfie' page and understand its functionality.,SUCCESS,SUCCESS,O,O
+Fill out a blank form on the app.,SUCCESS,FAILURE,O,O
+Fill out a form with image widgets and save it as a draft.,SUCCESS,PARTIALLY,O,
+Explore the AndroidShortcuts page and add a shortcut to the ODK Collect app on the Android home screen.,SUCCESS,FAILURE,X,
+Save the current form as a draft and navigate to the form submission page.,FAILURE,FAILURE,O,O
+Finalize a draft form and attempt to upload it.,FAILURE,FAILURE,O,
+Submit the current draft form.,SUCCESS,SUCCESS,O,O
+Upload a completed form to Google Sheets.,SUCCESS,FAILURE,X,
+Upload a completed form to Google Drive.,FAILURE,FAILURE,X,
+Sort the list of forms on the InstanceUploaderList page.,SUCCESS,SUCCESS,O,
+Filter the list of forms on the InstanceUploaderList page.,SUCCESS,SUCCESS,O,
+Complete a new form on the FormFilling page.,SUCCESS,SUCCESS,O,O
+Fill in the text fields in the form and navigate through the form.,FAILURE,SUCCESS,O,O
+Explore the additional options and functionalities provided in the 'More options' widget on the FormFilling page.,FAILURE,SUCCESS,O,
+Configure the display settings of the project.,FAILURE,SUCCESS,O,
+Change the color of the project to a new color.,SUCCESS,SUCCESS,O,
+Change the project icon.,FAILURE,SUCCESS,O,
+Navigate back to the MainMenu page and then move to the FormMap page which has not been visited yet.,FAILURE,FAILURE,O,
+Navigate back to the MainMenu from the ProjectPreferences page.,SUCCESS,SUCCESS,O,O
+Change the project color to a different color.,SUCCESS,FAILURE,O,O
+"Navigate to the ""AndroidShortcuts"" page from the ""MainMenu"" page.",FAILURE,FAILURE,X,
+Start filling out a new form.,FAILURE,SUCCESS,O,O
+Fill in the editable widget with a text string.,SUCCESS,SUCCESS,O,
+"Fill the ""text type with numbers appearance"" field with a number.",SUCCESS,SUCCESS,O,
+Navigate to the FormHierarchy page and explore the different form elements.,SUCCESS,SUCCESS,O,O
+Navigate to the FormHierarchy page and interact with different form elements.,FAILURE,SUCCESS,O,O
+Navigate to the Project settings page and modify a project setting.,SUCCESS,SUCCESS,O,O
+Modify the project preferences and then navigate to the AndroidShortcuts page.,FAILURE,FAILURE,X,
+Navigate to the AndroidShortcuts page from the MainMenu page and explore its features.,FAILURE,FAILURE,X,
+Navigate to the GoogleDrive page and attempt to connect to a Google Drive account.,FAILURE,FAILURE,X,
+Upload a filled form to Google Sheets.,FAILURE,FAILURE,X,
+Navigate to the FormMap page and explore its features to understand how it can be used for form management.,FAILURE,FAILURE,X,
+Configure project settings using a QR code.,FAILURE,PARTIALLY,O,
+Switch to the QR code scanning functionality and scan a QR code.,FAILURE,PARTIALLY,O,O
+Share the QR code via available sharing options.,FAILURE,PARTIALLY,O,

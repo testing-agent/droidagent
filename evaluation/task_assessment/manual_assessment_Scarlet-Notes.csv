@@ -1,0 +1,21 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Create a new note in the Scarlet Notes FD app.,SUCCESS,SUCCESS,,
+"Create a list note titled ""Study Topics"" with the items ""Machine Learning"", ""Data Structures"", and ""Computer Networks"".",FAILURE,FAILURE,,
+"Add the previously created note titled ""My Computer Science Journey"" to the favourites.",FAILURE,FAILURE,,
+"Create a list note titled ""Study Topics"" with items ""Topic 1"", ""Topic 2"", and ""Topic 3"".",FAILURE,FAILURE,,O
+"Archive an existing note titled ""My Computer Science Journey"".",SUCCESS,SUCCESS,,
+"Create a list note titled ""Programming Languages to Learn"" with items ""Python"", ""Java"", and ""C++"".",FAILURE,FAILURE,,O
+"Edit the content of the note titled ""Programming Languages to Learn"".",SUCCESS,SUCCESS,,
+"Create a list note titled ""Data Structures to Study"" with items ""Arrays"", ""Linked Lists"", ""Stacks"", ""Queues"", and ""Trees"".",FAILURE,FAILURE,,O
+"Create a list note titled ""Programming Languages to Master"" with items ""Python"", ""Java"", and ""C++"".",FAILURE,FAILURE,,O
+"Create a list note titled ""Software Development Life Cycle"" with items ""Requirement Analysis"", ""Design"", ""Implementation"", ""Testing"", and ""Maintenance"".",FAILURE,FAILURE,,O
+Import a note from an external source.,FAILURE,FAILURE,,
+Create a new tag for notes in the Scarlet Notes FD app.,SUCCESS,SUCCESS,,
+"Apply the ""Personal Notes"" tag to the note titled ""My Computer Science Journey"".",SUCCESS,SUCCESS,,
+"Share the note titled ""My Computer Science Journey"" via email.",FAILURE,SUCCESS,,
+"Create a list note titled ""Weekend Tasks"" with the items ""Grocery Shopping"", ""Laundry"", and ""Study for Exam"".",SUCCESS,FAILURE,,O
+"Delete the note titled ""Weekend Tasks"".",SUCCESS,FAILURE,,
+"Add items to a previously created list note titled ""Programming Languages to Learn"".",FAILURE,FAILURE,,
+Navigate to the settings page and explore its functionalities.,FAILURE,FAILURE,,
+Import a note from an external source into the Scarlet Notes FD app.,FAILURE,FAILURE,,
+Configure a widget on the home screen of the Android device to access notes in the Scarlet Notes FD app.,FAILURE,FAILURE,,

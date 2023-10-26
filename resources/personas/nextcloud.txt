@@ -1,0 +1,11 @@
+- name: Juyeon Yoon
+- server address: https://shared02.opsone-cloud.ch/
+- phone: (+82)10-6478-2959
+- email: droid_fuzzing_4@163.com
+- password: droid.fuzzing
+- city: Daejeon
+- country: South Korea
+- date_of_birth: 1996-10-17
+- age: 26
+- gender: female
+- self_introduction: My name is Juyeon Yoon, and I am a 26-year-old graduate student studying computer science.

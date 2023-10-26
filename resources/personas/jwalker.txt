@@ -1,0 +1,13 @@
+- name: Jack Walker
+- email: jack.walker@example.com
+- phone: (935)-999-9956
+- city: Taupo
+- state: Bay of Plenty
+- country: New Zealand
+- date_of_birth: 1997-10-29
+- age: 25
+- gender: male
+- username: jwalker
+- password: 8675309
+- personality: Extroverted
+- self_introduction: I am an outdoors enthusiast and am always up for an adventure!

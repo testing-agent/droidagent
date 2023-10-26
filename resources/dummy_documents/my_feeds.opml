@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no' ?>
+<opml version="2.0">
+  <head>
+    <title>AntennaPod Subscriptions</title>
+    <dateCreated>10 Oct 23 07:55:43 +0900</dateCreated>
+  </head>
+  <body>
+    <outline text="Crime Junkie" title="Crime Junkie" type="rss" xmlUrl="https://feeds.simplecast.com/qm_9xx0g" htmlUrl="https://audiochuck.com" />
+    <outline text="SmartLess" title="SmartLess" type="rss" xmlUrl="https://rss.art19.com/smartless" htmlUrl="https://wondery.com/shows/smartless/?utm_source=rss" />
+  </body>
+</opml>

@@ -1,0 +1,25 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Log into the MaterialFBook app using the given username and password.,SUCCESS,SUCCESS,,
+Open the navigation drawer to access the unvisited pages.,SUCCESS,SUCCESS,,
+Explore the Settings page and adjust any preferences if needed.,FAILURE,SUCCESS,,
+Finalize changing the text scale in the Settings page.,SUCCESS,SUCCESS,,
+Change the location access setting in the MaterialFBook app.,SUCCESS,SUCCESS,,
+Disable the option to send crash reports via email.,SUCCESS,SUCCESS,O,
+Navigate to the Video page and watch a video.,FAILURE,FAILURE,X,
+Discover and explore the functionalities of the Photo page by uploading a photo from the device gallery.,FAILURE,FAILURE,X,
+Browse the photo albums of the 'Rusty Wallace Kia Alcoa' page.,FAILURE,FAILURE,O,
+Post a photo on the MaterialFBook app.,FAILURE,FAILURE,O,O
+Watch a video on the Video page.,FAILURE,FAILURE,O,O
+Post a status update with a photo on the MaterialFBook app.,SUCCESS,SUCCESS,O,
+React to a post and leave a comment on the Main page.,SUCCESS,FAILURE,O,
+Find and watch a popular video on the Video page.,FAILURE,FAILURE,O,
+React to the post from 'Everything Christmas' and leave a comment.,SUCCESS,FAILURE,O,O
+Upload a photo from the device's gallery to the Photo page.,FAILURE,FAILURE,X,
+Browse the photos on the 'Everything Christmas' page.,FAILURE,SUCCESS,,O
+Find and watch a video about Christmas decorations on the Video page.,FAILURE,FAILURE,X,
+React to a video post on the Video page.,FAILURE,FAILURE,X,
+Search for a friend's profile and view their shared videos on the Video page.,FAILURE,FAILURE,X,
+Search for a friend's profile and view their posts.,FAILURE,FAILURE,O,
+Search for a friend's profile by entering their name into the search field.,FAILURE,FAILURE,X,
+Search for a friend by typing their name into the search textfield and confirm the search.,SUCCESS,SUCCESS,O,
+Revisit the task of navigating to the Video page and explore its functionalities.,FAILURE,FAILURE,X,

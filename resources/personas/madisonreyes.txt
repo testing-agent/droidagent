@@ -1,0 +1,13 @@
+- name: Madison Reyes
+- email: madison.reyes@example.com
+- phone: (322) 794-6840
+- city: Long Beach
+- state: North Carolina
+- country: United States
+- date_of_birth: 1990-02-14
+- age: 33
+- gender: female
+- username: madisonreyes
+- password: jhg1@#sdn
+- personality: Friendly and outgoing
+- self_introduction: I am a friendly and outgoing person who loves to meet new people. I enjoy spending time with my friends and family and going on adventures. I'm always up for a challenge and I like to learn new things.

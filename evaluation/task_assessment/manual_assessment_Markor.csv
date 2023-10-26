@@ -1,0 +1,29 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Navigate to the Main page by scrolling through the introduction pages.,FAILURE,FAILURE,O,
+Navigate to the Main page by exploring potential actions on the current page.,FAILURE,FAILURE,O,
+Scroll through the ViewPager widget to explore its content.,SUCCESS,SUCCESS,,
+Scroll through the ViewPager widget on the Intro page to discover more content and possible navigation options.,FAILURE,SUCCESS,,
+"Finish the introduction by clicking the ""DONE"" button.",SUCCESS,SUCCESS,,
+Create a new file in the Markor app.,SUCCESS,FAILURE,O,
+"Open and read the contents of the file ""todo.example.txt"".",FAILURE,FAILURE,X,
+"Create a new folder named ""School Projects"" via the FOLDER button.",SUCCESS,FAILURE,O,
+Create a To-Do list in the 'To-Do' tab.,SUCCESS,SUCCESS,O,
+"Create a quick note on the ""QuickNote"" page with the title ""Study Plan"" and content ""Review algorithms on Friday"".",SUCCESS,FAILURE,,
+"Create a new To-Do list titled ""Weekend Tasks"" and add a task ""Complete CS project"" to it.",SUCCESS,FAILURE,O,
+Share the current document.,FAILURE,SUCCESS,,
+Share a previously made note via the Markor app.,FAILURE,SUCCESS,O,
+"Edit the content of the ""School Projects"" document by bolding a text.",SUCCESS,SUCCESS,,
+"Format the content of the ""School Projects"" document by creating an unordered list.",SUCCESS,SUCCESS,,
+"Format the text in the ""School Projects"" document using the 'Italic' and 'Check list' options.",SUCCESS,SUCCESS,,
+"Add a timestamp to the ""School Projects"" document.",FAILURE,SUCCESS,,
+"Use the search functionality to find a specific piece of text within the ""School Projects"" document.",FAILURE,SUCCESS,,
+Navigate to the settings page and change a setting.,FAILURE,SUCCESS,,
+"Share the ""School Projects"" document as a PDF.",FAILURE,SUCCESS,,
+"Share the ""School Projects"" document via email.",FAILURE,SUCCESS,,
+"Share the ""School Projects"" document through email.",FAILURE,SUCCESS,,O
+Navigate to the settings page and change the theme of the app.,FAILURE,FAILURE,,
+Change the theme of the Markor app from the Settings page.,SUCCESS,SUCCESS,,O
+"Create an ordered list in the ""School Projects"" document.",SUCCESS,SUCCESS,,
+"Navigate to the ""ActionOrder"" page and try to reorder a task or a note.",FAILURE,FAILURE,X,
+"Create a quick note titled ""Study Notes"" on the Markor app.",FAILURE,SUCCESS,,O
+"Create a to-do list titled ""Study Plan"" in the Markor app.",FAILURE,SUCCESS,,O

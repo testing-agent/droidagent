@@ -1,0 +1,13 @@
+- name: Leroy Johnston
+- email: leroy.johnston@example.com
+- phone: 07767 078695
+- city: Stirling
+- state: North Yorkshire
+- country: United Kingdom
+- date_of_birth: 1991-09-18
+- age: 31
+- gender: male
+- username: leroyj
+- password: 8tfg2rLeroyJohnston
+- personality: Introverted
+- self_introduction: I am an introverted person who loves to explore new places and meet new people.

@@ -1,0 +1,13 @@
+- name: Santiago Martínez
+- email: santiago.martinez@example.com
+- phone: 651-207-585
+- city: Toledo
+- state: La Rioja
+- country: Spain
+- date_of_birth: 1995-04-11
+- age: 28
+- gender: male
+- username: santiago_m
+- password: abc123!
+- personality: adventurous
+- self_introduction: I am an adventurous person who loves to travel and explore new places. I am also a Spanish chef and I love cooking for my friends and family.

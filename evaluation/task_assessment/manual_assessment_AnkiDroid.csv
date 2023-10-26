@@ -1,0 +1,45 @@
+task,agent_determined_result,manual_result,is_possible_task,comment,duplicated
+Synchronize the existing AnkiDroid account with the app.,SUCCESS,SUCCESS,O,,
+Create a new deck and add a few flashcards to it.,FAILURE,PARTIALLY,O,,
+"Create a new flashcard in the ""My Deck"" deck with the question ""What is the capital city of France?"" and the answer ""Paris"".",SUCCESS,SUCCESS,O,,O
+Attach a photo to the 'Front' field of the flashcard in the NoteEditor page.,SUCCESS,SUCCESS,O,,
+"Review the flashcards in the ""My Deck"" deck.",FAILURE,SUCCESS,O,,
+"Review the flashcard ""What is the capital city of France?"" and rate its difficulty.",SUCCESS,SUCCESS,O,,
+Flag the currently reviewed flashcard.,SUCCESS,SUCCESS,O,,
+Edit the note of the current flashcard.,SUCCESS,SUCCESS,O,,
+"Obtain statistics about the flashcards in the ""My Deck"" deck.",FAILURE,FAILURE,O,,
+"Create a filtered deck from the ""My Deck"" deck.",SUCCESS,SUCCESS,O,,
+"Change the ""Limit to"" option for the filtered deck.",SUCCESS,SUCCESS,O,,
+"View all the cards in the ""My Filtered Deck"" on the CardBrowser page.",SUCCESS,SUCCESS,O,,
+"Access and view the Statistics of the ""My Filtered Deck"".",SUCCESS,SUCCESS,O,,
+Modify the 'New Card Position' setting in the Preferences page.,FAILURE,FAILURE,O,,
+Modify the fields of a note type using the ModelFieldEditor page.,SUCCESS,SUCCESS,O,,
+Create a new card template in the CardTemplateEditor page.,FAILURE,FAILURE,O,,
+Rename a field in the note type.,SUCCESS,SUCCESS,O,,
+Create a new field in the note type using the ModelFieldEditor page.,FAILURE,FAILURE,O,,
+Reposition a field in a note type on the ModelFieldEditor page.,SUCCESS,SUCCESS,O,,
+"Sort flashcards by a specific field in the ""My Deck"" deck.",FAILURE,SUCCESS,O,,
+Translate a flashcard's content from English to French.,SUCCESS,FAILURE,O,Translation server deprecated,
+Add a tag to the flashcard in the NoteEditor page.,FAILURE,PARTIALLY,O,Droidbot input bug,
+Add a tag to the current flashcard in the NoteEditor page.,FAILURE,PARTIALLY,O,Retry,O
+"Add a tag ""Study Tips"" to a flashcard.",SUCCESS,PARTIALLY,O,Retry,O
+Add an image to a flashcard in the MultimediaEditField page.,SUCCESS,SUCCESS,O,Duplicated,O
+Add an audio clip to a flashcard.,SUCCESS,SUCCESS,O,,
+"Preview a created flashcard on the ""Previewer"" page.",SUCCESS,SUCCESS,O,,
+"Access the ""Translation"" page and attempt to translate a foreign language word.",FAILURE,FAILURE,O,,O
+"Filter cards by the tag ""Study Tips"" on the CardBrowser page.",SUCCESS,FAILURE,O,,
+"Change the note type of a flashcard from ""Basic (and reversed card)"" to another type in the NoteEditor page.",SUCCESS,SUCCESS,O,,
+"Explore the additional options available on the NoteEditor page by interacting with the ""More options"" widget.",SUCCESS,SUCCESS,O,,
+Attach a video clip to a flashcard.,FAILURE,FAILURE,X,,
+Translate a word or phrase in the editable field.,FAILURE,FAILURE,O,Retry,O
+Translate a single word using the translation function on the MultimediaEditField page.,SUCCESS,FAILURE,O,Retry,O
+Translate a phrase from English to French.,FAILURE,FAILURE,O,,O
+Change the target language from Arabic to French on the Translation page.,SUCCESS,SUCCESS,O,Retry,
+Translate a simple English phrase to French.,SUCCESS,PARTIALLY,O,Retry,O
+Translate an English phrase to French using the translation functionality of the app.,FAILURE,FAILURE,O,Retry,O
+Attach a video to a flashcard and preview it in the VideoPlayer page.,FAILURE,FAILURE,X,Retry,
+"Navigate to the Info page by clicking on the ""Navigate up"" button from the current NoteEditor page, and then explore the Info page.",FAILURE,FAILURE,O,,
+Navigate to the Info page and read the information about the app.,FAILURE,FAILURE,O,Retry,O
+Navigate to the Info page to learn more about the app's functionalities and usage.,FAILURE,FAILURE,O,Retry,O
+"Create a custom deck named ""Computer Science Quiz"".",SUCCESS,SUCCESS,O,,O
+"Define custom steps for the ""Computer Science Quiz"" deck.",SUCCESS,SUCCESS,O,,

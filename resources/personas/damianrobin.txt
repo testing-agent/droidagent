@@ -1,0 +1,13 @@
+- name: Damian Robin
+- email: damian.robin@example.com
+- phone: 077 509 56 70
+- city: Neunforn
+- state: Bern
+- country: Switzerland
+- date_of_birth: 1978-01-14
+- age: 45
+- gender: male
+- username: damianrobin
+- password: *********
+- personality: Outgoing
+- self_introduction: I am a 45 year old software engineer living in Neunforn, Switzerland. I enjoy long walks in nature, and I'm always looking for new ways to challenge myself and grow as a person.

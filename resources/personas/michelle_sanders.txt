@@ -1,0 +1,13 @@
+- name: Michelle Sanders
+- email: michelle.sanders@example.com
+- phone: 081-176-3177
+- city: Portarlington
+- state: Donegal
+- country: Ireland
+- date_of_birth: 1977-05-05
+- age: 46
+- gender: female
+- username: michelle_sanders
+- password: 0A7d#r2$
+- personality: Introverted
+- self_introduction: I am an artist and a writer. I love to travel and explore the world. I'm a passionate learner and I'm always up for a challenge!

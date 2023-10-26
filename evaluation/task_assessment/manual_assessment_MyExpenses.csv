@@ -1,0 +1,43 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Change the app theme to Dark and set the transaction list design to Compact.,SUCCESS,SUCCESS,O,
+Adjust the font size to a comfortable level.,FAILURE,FAILURE,O,
+Set up a new account in the My Expenses app.,FAILURE,SUCCESS,O,
+"Create a new transaction with a specific amount, category, and payee.",SUCCESS,SUCCESS,O,
+Set up a monthly budget in the My Expenses app.,SUCCESS,SUCCESS,,
+View the summary of the budget status and transaction history in the MyExpenses page.,SUCCESS,SUCCESS,O,
+"Try out the budgeting feature by tapping on the ""Try"" button.",SUCCESS,FAILURE,X,
+"Explore the functionalities of the ""More options"" widget on the ""ManageBudgets"" page.",SUCCESS,SUCCESS,O,
+Create a new budget.,FAILURE,FAILURE,O,
+Modify the allocated budget amount using the calculator widget.,SUCCESS,SUCCESS,,O
+Create a new payee in the 'ManageParties' page.,FAILURE,FAILURE,X,
+Access the 'Help' page and read the information provided to better understand the functionalities of the app.,SUCCESS,SUCCESS,,
+Filter the transaction list by selecting a payee/payer.,FAILURE,FAILURE,,
+Modify the status of the checkbox for the 'Jades Superstore' party.,SUCCESS,SUCCESS,O,
+Explore the functionality of the 'Select' button on the ManageParties page.,SUCCESS,SUCCESS,O,
+Discard a budget plan.,SUCCESS,SUCCESS,,
+Use the search function on the MyExpenses page to search for a transaction by entering a keyword.,SUCCESS,FAILURE,O,
+Modify the details of an existing transaction in the MyExpenses app.,SUCCESS,SUCCESS,O,
+Create a new transaction template by using the 'Templates and plans' button on the MyExpenses page.,SUCCESS,SUCCESS,O,
+Change the default currency in the ManageCurrencies page of the My Expenses app.,FAILURE,FAILURE,X,
+Use the Help feature within the ExpenseEdit page to understand more about the app's navigation and functionalities.,SUCCESS,SUCCESS,O,O
+Create a backup of the current data in the My Expenses app.,FAILURE,FAILURE,O,
+Backup data in the My Expenses app.,FAILURE,FAILURE,O,O
+Change the default currency in the My Expenses app.,FAILURE,FAILURE,O,O
+Change the home currency from US Dollar to Australian Dollar in the Preference page.,SUCCESS,SUCCESS,,O
+Set up a backup for the app's data.,SUCCESS,SUCCESS,,O
+Change the default currency in the ManageCurrencies page.,FAILURE,FAILURE,,O
+Attach an image to a transaction in the ExpenseEdit page.,FAILURE,SUCCESS,O,
+Create a new transaction and attach an image to it in the ExpenseEdit page.,FAILURE,FAILURE,,O
+Attach an image to a transaction from the Gallery page.,FAILURE,FAILURE,,O
+Create a new budget on the Budget page.,FAILURE,FAILURE,,O
+Create a new budget on the BudgetEdit page.,SUCCESS,SUCCESS,,O
+Set a monthly budget.,SUCCESS,SUCCESS,,O
+Set up a backup of the app's data on Dropbox.,FAILURE,FAILURE,X,
+Edit an existing budget in the ManageBudgets page.,FAILURE,FAILURE,O,
+"Edit the account details by changing the account name, description, and type.",SUCCESS,SUCCESS,,
+"Create a new ""Credit Card"" account.",FAILURE,FAILURE,O,
+Change the default currency from US Dollar to Euro in the ManageCurrencies page.,SUCCESS,SUCCESS,O,O
+Import financial data from an external source using the Import / Export feature.,FAILURE,SUCCESS,,
+Import a CSV file containing financial data into the My Expenses app.,FAILURE,SUCCESS,,O
+Successfully import a CSV file into the app.,FAILURE,FAILURE,,O
+Locate and select the correct CSV file from the Documents page.,FAILURE,FAILURE,X,O

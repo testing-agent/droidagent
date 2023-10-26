@@ -1,0 +1,39 @@
+task,agent_determined_result,manual_result,is_possible_task,duplicated
+Proceed to the next page from the Introduction page.,SUCCESS,SUCCESS,,
+Start recording a new track.,SUCCESS,SUCCESS,,
+Stop the ongoing track recording.,SUCCESS,FAILURE,,O
+Create a marker for the current track recording.,FAILURE,FAILURE,,
+Insert a marker while recording a track in the OpenTracks app.,SUCCESS,SUCCESS,,O
+Review the aggregated statistics of recorded tracks.,SUCCESS,SUCCESS,,
+Navigate to the Help page and read the instructions there.,SUCCESS,SUCCESS,,
+Learn how to export a recorded track.,SUCCESS,SUCCESS,X,
+"Edit the recorded track ""Green's Favorite Spot"".",SUCCESS,SUCCESS,,
+Import a track from an external source.,SUCCESS,SUCCESS,,
+View the detailed error messages from the unsuccessful import process.,SUCCESS,SUCCESS,,
+Start a new track recording.,SUCCESS,SUCCESS,,O
+Stop the current track recording.,SUCCESS,SUCCESS,,
+Start the sensor function on the OpenTracks app.,SUCCESS,SUCCESS,,O
+Customize the layout of the TrackRecording page.,SUCCESS,FAILURE,,
+Customize the user interface settings according to personal preferences.,SUCCESS,SUCCESS,,
+Customize the 'UI Theme' and 'Select show on map behavior' settings in the Settings page.,SUCCESS,SUCCESS,,O
+Export a track in GPX (without photos) format.,SUCCESS,SUCCESS,,
+Navigate to the About page to learn more about the OpenTracks app.,SUCCESS,SUCCESS,,
+Try to import a track from an unsupported file format to trigger an error.,SUCCESS,SUCCESS,,O
+Start recording a new track and add a marker to it.,SUCCESS,SUCCESS,,O
+"Insert a photo to the marker ""Hiking Trail Start Point"".",SUCCESS,SUCCESS,,
+Edit the details of a marker in the track.,SUCCESS,SUCCESS,,
+Edit the details of the currently stopped track.,FAILURE,SUCCESS,,
+"Search for a specific track named ""Hiking in the Mountains Track"" from the TrackList.",SUCCESS,SUCCESS,,
+"Edit the details of the track ""Hiking in the Mountains Track"" by changing its name to ""Mountain Adventure"".",SUCCESS,SUCCESS,,O
+"Share the ""Mountain Adventure"" track with a friend via email.",FAILURE,SUCCESS,,
+Export all tracks into one file.,SUCCESS,SUCCESS,,O
+Start a new track recording on the OpenTracks app.,SUCCESS,SUCCESS,,O
+Display the current recording on the map.,SUCCESS,SUCCESS,,
+Import a directory of tracks into the OpenTracks app.,FAILURE,FAILURE,,O
+Start recording a new track and monitor the statistics related to the track recording.,SUCCESS,SUCCESS,,O
+Share the details of a specific marker from the current track.,FAILURE,SUCCESS,,
+"Complete adding the marker ""My Special Spot"" by editing the marker details and inserting an image from the gallery.",FAILURE,FAILURE,,O
+Initiate a new track recording in the OpenTracks app.,SUCCESS,FAILURE,,O
+Explore and understand the interval settings in the TrackRecording page.,FAILURE,SUCCESS,,
+Stop the current track recording and navigate to the TrackStopped page.,SUCCESS,SUCCESS,,O
+Discard the currently stopped track.,SUCCESS,SUCCESS,,

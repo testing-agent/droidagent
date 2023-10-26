@@ -1,0 +1,35 @@
+task,agent_determined_result,manual_result,is_possible_task,,duplicated
+Create a new note in the Omni Notes Alpha app.,SUCCESS,SUCCESS,,,
+Capture a photo using the camera option and attach it to a new note.,FAILURE,SUCCESS,,,
+Attach a document to a new note.,SUCCESS,SUCCESS,,aborted due to the loading time,
+Attach a photo from the gallery to a new note.,FAILURE,FAILURE,O,,
+Attach a selected photo from the gallery to a new note in the Omni Notes Alpha app.,FAILURE,PARTIALLY,O,,O
+Attach a recent file to a new note.,FAILURE,FAILURE,O,,
+"Record a voice note titled ""Study Plan"".",FAILURE,PARTIALLY,O,discard the change instead of saving it,
+"Edit the note titled ""Meeting Notes"" to add a reminder about a meeting.",SUCCESS,FAILURE,O,,
+"Add a tag to the existing note titled ""Meeting Notes"".",SUCCESS,SUCCESS,,,
+"Categorize the existing note titled ""Meeting Notes"" under a new category.",FAILURE,SUCCESS,,,
+"Share the note titled ""Meeting Notes"" using the ""Share"" button.",FAILURE,SUCCESS,,,
+Lock an existing note.,FAILURE,SUCCESS,,,
+"Search for the note titled ""Meeting Notes"" using the search function.",FAILURE,SUCCESS,O,,
+"Use the search function to find the note titled ""Meeting Notes"".",SUCCESS,SUCCESS,,,O
+"Add a reminder to the note titled ""Meeting Notes"".",SUCCESS,SUCCESS,,,
+"Set a reminder to repeat every day for the note titled ""Meeting Notes"".",FAILURE,SUCCESS,,,O
+"Share the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,O
+"Navigate to the ""Settings"" page and adjust note settings.",FAILURE,FAILURE,,,
+"Navigate to the Settings page and adjust the reminder settings for the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,
+Navigate to the 'Stats' page to view the statistics of note-taking habits.,FAILURE,FAILURE,O,,
+"Adjust the reminder settings for the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,O
+"Categorize the note titled ""Meeting Notes"" under the previously created category ""Project Updates"".",SUCCESS,SUCCESS,,,
+"Add a new tag to the note titled ""Meeting Notes"".",SUCCESS,FAILURE,,,O
+Navigate to the 'Stats' page and view the note-taking statistics.,FAILURE,FAILURE,O,,
+Sort the notes in a different order.,SUCCESS,SUCCESS,,,
+"Attach an image from the gallery to the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,O
+"Attach an image to the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,O
+Navigate to the 'Stats' page to view note-taking statistics.,FAILURE,FAILURE,O,,
+Apply a filter to hide archived notes.,SUCCESS,SUCCESS,,,
+Set a password for the notes to secure them.,FAILURE,SUCCESS,,,
+Navigate to the Gallery page to view attached images.,FAILURE,FAILURE,O,,
+"Add a new tag ""Study Material"" to the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,O
+"Add a new tag ""CS Studies"" to the note titled ""Meeting Notes"".",FAILURE,FAILURE,,,O
+"Share the note titled ""Meeting Notes"" with a contact via email.",FAILURE,FAILURE,,,

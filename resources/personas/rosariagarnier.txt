@@ -1,0 +1,13 @@
+- name: Rosaria Garnier
+- email: rosaria.garnier@example.com
+- phone: 078 664 56 61
+- city: Mönthal
+- state: Zug
+- country: Switzerland
+- date_of_birth: 1997-02-01
+- age: 26
+- gender: female
+- username: rosariagarnier
+- password: R0s@ri@G@rn!3r
+- personality: Introverted
+- self_introduction: I am a 26-year-old Swiss woman living in Mönthal. I love the outdoors and spending time with family and friends. I'm an introvert but I'm also a great listener and always willing to help.

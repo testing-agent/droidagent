@@ -1,0 +1,13 @@
+- name: Oscar Turner
+- email: oscar.turner@example.com
+- phone: (483)-499-3427
+- city: Hamilton
+- state: Hawke'S Bay
+- country: New Zealand
+- date_of_birth: 1972-05-25
+- age: 51
+- gender: male
+- username: oturner
+- password: n3v3rgu3$$
+- personality: Introverted
+- self_introduction: I am an avid traveler and outdoorsman. I enjoy exploring new places and learning about different cultures. I am also passionate about photography and music. I am a friendly and outgoing person who enjoys meeting new people and making friends.

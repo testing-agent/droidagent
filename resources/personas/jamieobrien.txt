@@ -1,0 +1,13 @@
+- name: Jamie Obrien
+- email: jamie.obrien@example.com
+- phone: 081-827-7650
+- city: Ballina
+- state: Galway
+- country: Ireland
+- date_of_birth: 1979-04-18
+- age: 44
+- gender: male
+- username: jamieobrien
+- password: v1.9kQPw%$
+- personality: Outgoing and friendly
+- self_introduction: I am a software engineer and I love to travel and explore new places.
