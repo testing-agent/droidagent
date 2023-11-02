@@ -2,14 +2,14 @@
 
 Test with artificial user intents!
 
-DroidAgent produces **high-level testing scenarios** with executable scripts (currently in the format of [uiautomator2](https://github.com/openatx/uiautomator2)) by autonomously exploring a given application under test (AUT). It is built as a modular framework driven by multiple LLM instances.
+DroidAgent produces **high-level testing scenarios** with executable scripts (currently in the format of [UIAutomator2](https://github.com/openatx/uiautomator2)) by autonomously exploring a given application under test (AUT). It is built as a modular framework driven by multiple LLM instances.
 
 ![droidagent_overview](resources/droidagent.jpg)
 
 ## Table of Contents
 1. [Setup](#setup)
 2. [Running DroidAgent](#run-droidagent)
-3. [Replicate evaluation results](#replicate-evaluation-results)
+3. [Replicate Evaluation Results](#replicate-evaluation-results)
 4. [Troubleshooting](#troubleshooting)
 
 ## Setup
@@ -67,13 +67,23 @@ According to your needs, use DroidAgent with a persona (a set of user characteri
     })
 ```
 
+### Generate UIAutomator Scripts
+DroidAgent supports generating corresponding [UIAutomator2](https://github.com/openatx/uiautomator2) scripts from the exploration history. In the `script` directory, run the following command:
+```bash
+$ python make_script.py --result_dir [RESULT_DIR] --project [PROJECT_NAME] --package [PACKAGE_NAME]
+# example: python make_script.py --project AnkiDroid --package_name com.ichi2.anki --result_dir ../evaluation/data/AnkiDroid
+```
+`[RESULT_DIR]` should point to the `[OUTPUT_DIR]` you used in the previous step. Refer to the `evaluation/package_name_map.json` to find the package name of the AUT used in our evaluation. The replay script will be generated in the `gen_tests` directory. You can check the generation example in the `gen_test_examples` directory.
+
+Note that the scripts are not guaranteed to be fully reproducible due to the possible flakiness of the AUT, but they can further be processed (e.g., manual exception handling) for constructing robust regression testing suite.
 
 ### Generate Reports
 We provide a script to generate a markdown report consisting of the generated tasks during the testing process. Run the following command in the `script` directory:
 ```bash
 $ python make_report.py --result_dir [RESULT_DIR] --project [PROJECT_NAME]
+# example: python make_report.py --project AnkiDroid --result_dir ../evaluation/data/AnkiDroid
 ```
-Note that the `[RESULT_DIR]` should be the same as the `[OUTPUT_DIR]` you used in the previous step.
+`[RESULT_DIR]` should point to the `[OUTPUT_DIR]` as well.
 The task-by-task markdown report will be generated in the `reports/[PROJECT_NAME]` directory. Each report contains the task description, performed GUI actions, and the observation of the application state after the task execution with screenshots.
 
 [Reports on the evaluation data - published on website (TBD)](https://testing-agent.github.io/droidagent-reports/)

@@ -49,9 +49,9 @@ if __name__ == '__main__':
             screenshot_path = 'file://' + str(os.path.abspath(os.path.join(result_path, 'states', f'screen_{state_data["tag"]}.png')))
             state_str_to_screenshot_path[state_str] = screenshot_path
 
-    example_exp_data_file = os.path.join(result_path, 'exp_data.json')
+    exp_data_file = os.path.join(result_path, 'exp_data.json')
 
-    with open(example_exp_data_file, 'r') as f:
+    with open(exp_data_file, 'r') as f:
         exp_data = json.load(f)
 
     tasks = list(exp_data['task_results'].keys())
