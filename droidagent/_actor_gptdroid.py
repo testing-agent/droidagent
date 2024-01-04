@@ -3,7 +3,8 @@ import random
 import logging
 import time
 import copy
-from openai.error import InvalidRequestError, RateLimitError
+
+import openai
 
 from .config import agent_config
 from .action import *
@@ -46,10 +47,9 @@ class GPTDroidActor():
             try:
                 original_prompt = copy.deepcopy(self.current_prompt)
                 action = prompt_next_action(self.memory, error_message=None, full_prompt=self.current_prompt, contain_feedback=contain_feedback)
-            except (InvalidRequestError, RateLimitError) as e:
-                # exceed max token limit
-                # initialize prompt
-                self.logger.info(f'Exceed max token limit. Initialize prompt.')
+            except (openai.BadRequestError) as e:
+                # exceed max token limit: initialize prompt
+                self.logger.info(f'Exceeded max token limit. Initialize prompt.')
 
                 self.full_prompt['user_messages'].extend(self.current_prompt['user_messages'][:-1])
                 self.full_prompt['assistant_messages'].extend(self.current_prompt['assistant_messages'])
@@ -58,13 +58,7 @@ class GPTDroidActor():
 
                 contain_feedback = False
 
-            # except RateLimitError as e:
-            #     # exceed rate limit
-            #     print(e)
-            #     self.logger.info(f'Exceed rate limit. Try again with 10 seconds sleep.')
-            #     self.current_prompt = original_prompt
-            #     time.sleep(10)
-
+ 
         assert action is not None
         
         self.performed_actions.append(action)

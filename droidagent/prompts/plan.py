@@ -2,18 +2,9 @@ from ..config import agent_config
 from ..model import get_next_assistant_message, zip_messages
 from ..functions.possible_actions import *
 from ..utils import *
-from .act_v3_func_conversation import prompt_text_input, initialize_possible_actions
+from .act import prompt_text_input, initialize_possible_actions
 
 QUERY_COUNT = 3
-
-# voyager paper: automatic curriculum - from easy tasks to hard tasks
-# directive: The next task should not be too hard since I may not have the necessary resources or have learned enough skills to complete it yet.
-
-# A bit micro-managing?
-# 1. The task should correspond to a realistic usage scenario for a single function of the app, and should be achievable within a few steps from the current page. The task should not be too hard since {agent_config.persona_name} may not have the necessary resources or have learned enough knowledge about the app to complete it yet.
-# 2. Try novel tasks that are different from the tasks that {agent_config.persona_name} has performed before. Pay attention to the number of previous actions performed on a specific widget, and try to plan a task that involves an widget that has not been interacted with before, or a different action type on the same widget.
-# 3. The task should be likely to be performed by a person with the given profile.
-# 4. To retry previously failed task, provide better plan to make the task successful. Revise the task if previous task is impossible to achieve.
 
 """
 1. Persona-based exploration w/ custom testing objective
@@ -149,19 +140,36 @@ Good. Now, based on your previous answer, execute the first action (by calling a
     assistant_messages.append(get_next_assistant_message(system_message, user_messages, assistant_messages, model=agent_config.actor_model, functions=list(possible_action_functions.values())))
     response = assistant_messages[-1]
 
-    if not isinstance(response, dict): # retry if model doesn't do function call
-        error_message = f'You need to call a function to select the next action. Try again.'
+    if isinstance(response, str): # retry if model doesn't do function call
+        error_message = f'Call one of the given function instead of text answers.'
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
 
-    function_to_call = function_map[response['name']]
+    if response['function']['name'] not in possible_action_functions: # retry if model doesn't do a right function call
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': respone['function']['name'],
+            'return_value': json.dumps({
+                'error_message': f'You need to call a function among the given functions to select the next action or end the task for {agent_config.persona_name}. {response["function"]["name"]} is not a valid function name.'
+            })
+        }
+        return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
+
+    function_name = response['function']['name']
+    function_to_call = function_map[function_name]
     function_params = []
-    for param_name in possible_action_functions[response['name']]['parameters']['properties']:
+    for param_name in possible_action_functions[function_name]['function']['parameters']['properties']:
         function_params.append(param_name)
 
     try:
-        function_args = json.loads(response['arguments'])
+        function_args = json.loads(response['function']['arguments'])
     except json.decoder.JSONDecodeError:
-        error_message = f'You did not provide the required parameters for the function call. Please provide the following parameters: {function_params}'
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': respone['function']['name'],
+            'return_value': json.dumps({
+                'error_message': f'You did not provide the suitable parameters for the function call. Please provide the following parameters: {function_params}'
+            })
+        }
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
 
     processed_function_args = {}
@@ -169,13 +177,25 @@ Good. Now, based on your previous answer, execute the first action (by calling a
     for param_name in function_params:
         arg_value = function_args.get(param_name)
         if arg_value is None:
-            error_message = f'You did not provide the required parameter "{param_name}".'
+            error_message = {
+                'tool_call_id': response['id'],
+                'name': respone['function']['name'],
+                'return_value': json.dumps({
+                    'error_message': f'You did not provide the required parameter "{param_name}".'
+                })
+            }
             break
-        if param_name == 'target_widget_id':
+        if param_name == 'target_widget_ID':
             try:
                 arg_value = int(arg_value)
             except ValueError:
-                error_message = f'The value of the parameter "{param_name}" should be an integer.'
+                error_message = {
+                    'tool_call_id': response['id'],
+                    'name': respone['function']['name'],
+                    'return_value': json.dumps({
+                        'error_message': f'The value of the parameter "{param_name}" should be an integer.'
+                    })
+                }
                 break
         processed_function_args[param_name] = arg_value
 
@@ -185,6 +205,13 @@ Good. Now, based on your previous answer, execute the first action (by calling a
     action, error_message = function_to_call(**processed_function_args)
 
     if error_message is not None: # retry if target widget ID is not valid
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': response['function']['name'],
+            'return_value': json.dumps({
+                'error_message': error_message
+            })
+        }
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
     
     if action is not None and action.event_type == 'set_text':

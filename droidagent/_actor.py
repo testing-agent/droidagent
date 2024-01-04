@@ -6,7 +6,7 @@ import time
 from .config import agent_config
 from .action import *
 from .utils import *
-from .prompts.act_v3_func_conversation import prompt_action
+from .prompts.act import prompt_action
 from .prompts.critique_during_task import prompt_critique
 
 

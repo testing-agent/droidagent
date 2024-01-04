@@ -55,11 +55,14 @@ def end_task():
 
 def create_end_task_definition():
     return {
-        "name": "end_task",
-        "description": "Use this function to end the current task.",
-        "parameters": {
-            "type": "object",
-            "properties": {}
+        "type": "function",
+        "function": {
+            "name": "end_task",
+            "description": "Use this function to end the current task.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
         }
     }, end_task
 
@@ -69,11 +72,14 @@ def go_back():
 
 def create_go_back_action_definition():
     return {
-        "name": "go_back",
-        "description": "Use this function to navigate back to the previous screen.",
-        "parameters": {
-            "type": "object",
-            "properties": {}
+        "type": "function",
+        "function": {
+            "name": "go_back",
+            "description": "Use this function to navigate back to the previous screen.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
         }
     }, go_back
 
@@ -97,11 +103,14 @@ def press_search_key():
 
 def create_press_search_key_action_definition():
     return {
-        "name": "press_search_key",
-        "description": "Use this function to press the \"SEARCH\" key submit a search query when the search bar is focused and you finished typing your query.",
-        "parameters": {
-            "type": "object",
-            "properties": {}
+        "type": "function",
+        "function": {
+            "name": "press_search_key",
+            "description": "Use this function to press the \"SEARCH\" key submit a search query when the search bar is focused and you finished typing your query.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
         }
     }, press_search_key
 
@@ -110,11 +119,14 @@ def wait():
 
 def create_wait_definition():
     return {
-        "name": "wait",
-        "description": "Use this function not to perform any action and wait for a loading process to finish.",
-        "parameters": {
-            "type": "object",
-            "properties": {}
+        "type": "function",
+        "function": {
+            "name": "wait",
+            "description": "Use this function not to perform any action and wait for a loading process to finish.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
         }
     }, wait
 
@@ -130,23 +142,26 @@ def scroll(direction, target_widget_ID):
 
 def create_scroll_action_definition():
     return {
-        "name": "scroll",
-        "description": "Use this function to scroll on the target widget.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "direction": {
-                    "type": "string",
-                    "enum": ["UP", "DOWN", "LEFT", "RIGHT"],
-                    "description": "The direction to scroll the target scrollable widget",
+        "type": "function",
+        "function": {
+            "name": "scroll",
+            "description": "Use this function to scroll on the target widget.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "direction": {
+                        "type": "string",
+                        "enum": ["UP", "DOWN", "LEFT", "RIGHT"],
+                        "description": "The direction to scroll the target scrollable widget",
+                    },
+                    "target_widget_ID": {
+                        "type": "integer",
+                        "enum": current_context.get_scrollable_widget_ids(),
+                        "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"scroll\" in its possible_action_types property.",
+                    }
                 },
-                "target_widget_ID": {
-                    "type": "integer",
-                    "enum": current_context.get_scrollable_widget_ids(),
-                    "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"scroll\" in its possible_action_types property.",
-                }
-            },
-            "required": ["direction", "target_widget_ID"]
+                "required": ["direction", "target_widget_ID"]
+            }
         }
     }, scroll
 
@@ -161,18 +176,21 @@ def touch(target_widget_ID):
 
 def create_touch_action_definition():
     return {
-        "name": "touch",
-        "description": "Use this function to touch on the target widget.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "target_widget_ID": {
-                    "type": "integer",
-                    "enum": current_context.get_clickable_widget_ids(),
-                    "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"touch\" in its possible_action_types property.",
-                }
-            },
-            "required": ["target_widget_ID"]
+        "type": "function",
+        "function": {
+            "name": "touch",
+            "description": "Use this function to touch on the target widget.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "target_widget_ID": {
+                        "type": "integer",
+                        "enum": current_context.get_clickable_widget_ids(),
+                        "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"touch\" in its possible_action_types property.",
+                    }
+                },
+                "required": ["target_widget_ID"]
+            }
         }
     }, touch
 
@@ -187,18 +205,21 @@ def long_touch(target_widget_ID):
 
 def create_long_touch_action_definition():
     return {
-        "name": "long_touch",
-        "description": "Use this function to long touch on the target widget.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "target_widget_ID": {
-                    "type": "integer",
-                    "enum": current_context.get_long_clickable_widget_ids(),
-                    "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"long_touch\" in its possible_action_types property.",
-                }
-            },
-            "required": ["target_widget_ID"]
+        "type": "function",
+        "function": {
+            "name": "long_touch",
+            "description": "Use this function to long touch on the target widget.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "target_widget_ID": {
+                        "type": "integer",
+                        "enum": current_context.get_long_clickable_widget_ids(),
+                        "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"long_touch\" in its possible_action_types property.",
+                    }
+                },
+                "required": ["target_widget_ID"]
+            }
         }
     }, long_touch
 
@@ -213,18 +234,21 @@ def set_text(target_widget_ID):
 
 def create_set_text_action_definition():
     return {
-        "name": "set_text",
-        "description": f"Use this function to fill in the target textfield.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "target_widget_ID": {
-                    "type": "integer",
-                    "enum": current_context.get_editable_widget_ids(),
-                    "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"set_text\" in its possible_action_types property.",
-                }
-            },
-            "required": ["target_widget_ID"]
+        "type": "function",
+        "function": {
+            "name": "set_text",
+            "description": f"Use this function to fill in the target textfield.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "target_widget_ID": {
+                        "type": "integer",
+                        "enum": current_context.get_editable_widget_ids(),
+                        "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"set_text\" in its possible_action_types property.",
+                    }
+                },
+                "required": ["target_widget_ID"]
+            }
         }
     }, set_text
 
@@ -239,21 +263,24 @@ def set_text_self_contained(target_widget_ID, text):
 
 def create_set_text_self_contained_action_definition():
     return {
-        "name": "set_text",
-        "description": f"Use this function to fill in the target textfield.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "target_widget_ID": {
-                    "type": "integer",
-                    "enum": current_context.get_editable_widget_ids(),
-                    "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"set_text\" in its possible_action_types property.",
+        "type": "function",
+        "function": {
+            "name": "set_text",
+            "description": f"Use this function to fill in the target textfield.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "target_widget_ID": {
+                        "type": "integer",
+                        "enum": current_context.get_editable_widget_ids(),
+                        "description": "The \"ID\" property of the target widget in the current GUI state. The target widget must have \"set_text\" in its possible_action_types property.",
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "The text to fill in the target textfield.",
+                    }
                 },
-                "text": {
-                    "type": "string",
-                    "description": "The text to fill in the target textfield.",
-                }
-            },
-            "required": ["target_widget_ID", "text"]
+                "required": ["target_widget_ID", "text"]
+            }
         }
     }, set_text_self_contained

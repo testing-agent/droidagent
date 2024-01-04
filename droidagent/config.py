@@ -61,8 +61,6 @@ class AgentConfig:
         # persona info
         self.persona = None
 
-        self.openai_api_key = open(os.path.join(file_dir, '../.openai_api_key')).read().strip()
-
         self.actor_model = GPT_3_5_16k
         self.observer_model = GPT_3_5_16k
         self.planner_model = GPT_4

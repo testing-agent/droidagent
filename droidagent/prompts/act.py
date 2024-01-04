@@ -5,9 +5,6 @@ from ..utils import *
 
 QUERY_COUNT = 3
 
-# Do we need long-term view?
-# Inference on the remaining steps needed to complete the task: <1~2 sentences according to the memory, current app state, and the task end condition>
-
 def initialize_possible_actions(memory):
     possible_action_functions = {}
     function_map = {}
@@ -16,8 +13,8 @@ def initialize_possible_actions(memory):
 
     for function_creator in function_creators:
         function_def, func = function_creator()
-        possible_action_functions[function_def['name']] = function_def
-        function_map[function_def['name']] = func
+        possible_action_functions[function_def['function']['name']] = function_def
+        function_map[function_def['function']['name']] = func
 
     return possible_action_functions, function_map
 
@@ -94,23 +91,36 @@ Based on your reasoning, select the next action or end the task by calling one o
     assistant_messages.append(get_next_assistant_message(system_message, user_messages, assistant_messages, model=agent_config.actor_model, functions=list(possible_action_functions.values())))
     response = assistant_messages[-1]
 
-    if not isinstance(response, dict): # retry if model doesn't do function call
-        error_message = f'You need to call a function to select the next action or end the task for {agent_config.persona_name}.'
+    if isinstance(response, str): # retry if model doesn't do function call
+        error_message = f'Call one of the given function instead of text answers.'
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
 
-    if response['name'] not in possible_action_functions: # retry if model doesn't do a right function call
-        error_message = f'You need to call a function among the given functions to select the next action or end the task for {agent_config.persona_name}. {response["name"]} is not a valid function name.'
+    if response['function']['name'] not in possible_action_functions: # retry if model doesn't do a right function call
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': response['function']['name'],
+            'return_value': json.dumps({
+                'error_message': f'You need to call a function among the given functions to select the next action or end the task for {agent_config.persona_name}. {response["function"]["name"]} is not a valid function name.'
+            })
+        }
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
 
-    function_to_call = function_map[response['name']]
+    function_name = response['function']['name']
+    function_to_call = function_map[function_name]
     function_params = []
-    for param_name in possible_action_functions[response['name']]['parameters']['properties']:
+    for param_name in possible_action_functions[function_name]['function']['parameters']['properties']:
         function_params.append(param_name)
 
     try:
-        function_args = json.loads(response['arguments'])
+        function_args = json.loads(response['function']['arguments'])
     except json.decoder.JSONDecodeError:
-        error_message = f'You did not provide the required parameters for the function call. Please provide the following parameters: {function_params}'
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': respone['function']['name'],
+            'return_value': json.dumps({
+                'error_message': f'You did not provide the suitable parameters for the function call. Please provide the following parameters: {function_params}'
+            })
+        }
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
 
     processed_function_args = {}
@@ -118,13 +128,25 @@ Based on your reasoning, select the next action or end the task by calling one o
     for param_name in function_params:
         arg_value = function_args.get(param_name)
         if arg_value is None:
-            error_message = f'You did not provide the required parameter "{param_name}".'
+            error_message = {
+                'tool_call_id': response['id'],
+                'name': respone['function']['name'],
+                'return_value': json.dumps({
+                    'error_message': f'You did not provide the required parameter "{param_name}".'
+                })
+            }
             break
-        if param_name == 'target_widget_id':
+        if param_name == 'target_widget_ID':
             try:
                 arg_value = int(arg_value)
             except ValueError:
-                error_message = f'The value of the parameter "{param_name}" should be an integer.'
+                error_message = {
+                    'tool_call_id': response['id'],
+                    'name': respone['function']['name'],
+                    'return_value': json.dumps({
+                        'error_message': f'The value of the parameter "{param_name}" should be an integer.'
+                    })
+                }
                 break
         processed_function_args[param_name] = arg_value
 
@@ -134,6 +156,13 @@ Based on your reasoning, select the next action or end the task by calling one o
     action, error_message = function_to_call(**processed_function_args)
 
     if error_message is not None: # retry if target widget ID is not valid
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': response['function']['name'],
+            'return_value': json.dumps({
+                'error_message': error_message
+            })
+        }
         return prompt_action_function(memory, system_message, user_messages, assistant_messages, possible_action_functions, function_map, error_message=error_message, prompt_recorder=prompt_recorder, query_count=query_count-1)
 
     if action is not None and action.event_type == 'set_text':
@@ -148,6 +177,8 @@ Based on your reasoning, select the next action or end the task by calling one o
 
 
 def prompt_text_input(memory, system_message, user_messages, assistant_messages, target_widget, prompt_recorder=None, caller='actor'):
+    response = assistant_messages[-1]
+
     follow_up_question = f'''
 Good. From now on, act as you are {agent_config.persona_name} and provide the text to be inputted in the selected textfield (Widget ID: {target_widget.view_id}). 
 
@@ -168,7 +199,15 @@ Reasoning for generating proper text: {agent_config.persona_name} should input t
 Text: {agent_config.persona_name}
 '''.strip()
 
-    user_messages.append(follow_up_question)
+    follow_up_question_processed = {
+        'tool_call_id': response['id'],
+        'name': response['function']['name'],
+        'return_value': json.dumps({
+            'follow_up_question': follow_up_question
+        })
+    }
+
+    user_messages.append(follow_up_question_processed)
 
     received_text = None
     for _ in range(QUERY_COUNT):
@@ -182,7 +221,13 @@ Text: {agent_config.persona_name}
         if received_text is not None:
             break
         
-        error_message = f'You did not provide the text in the required template. Please provide the text in the following format: "Text:<your text>". For example, if you want to input "Hello World" into the textfield, you should answer with "Text:Hello World".'
+        error_message = {
+            'tool_call_id': response['id'],
+            'name': response['function']['name'],
+            'return_value': json.dumps({
+                'error_message': f'You did not provide the text content in the required template. Please provide the content to be inputted in the textfield in the following format: "Text: <your text content>". For example, if you want to input "Hello World" into the textfield, you should answer with "Text: Hello World".'
+            })
+        }
         user_messages.append(error_message)
 
     if received_text is None:

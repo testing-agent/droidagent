@@ -109,7 +109,7 @@ To replicate evaluation results for the paper "Intent-Driven Android GUI Testing
 * If you get a sqlite3 version-related error message from chromaDB dependency, follow the instruction about building pysqlite3 from source: [ChromaDB documentation](https://docs.trychroma.com/troubleshooting#sqlite)
 
 * In short: `pip install pysqlite3-binary`
-* Add following lines into `~/.pyenv/versions/testing-agent/lib/python3.10/site-packages/chromadb/__init__.py`:
+* Add following lines into `~/<your_python_directory>/lib/python3.10/site-packages/chromadb/__init__.py`:
 ```python
 __import__('pysqlite3')
 import sys

@@ -1,31 +1,149 @@
 from collections import defaultdict
 from .config import agent_config
 from .action import initialize_possible_actions, initialize_screen_scroll_action, initialize_go_back_action, initialize_enter_key_action
+from .utils import GUIStateManager, remove_quotes
+
+from collections import OrderedDict
+from functools import cached_property
 
 import json
+import copy
+import difflib
+import logging
+
+CONTEXT_LENGTH_LIMIT = 15000
+
+def minimize_view_tree(view_tree):
+    view_tree = copy.deepcopy(view_tree)
+    
+    new_root_elems = []
+    for root_elem in prune_elements(view_tree):
+        new_root_elems.extend(additionally_prune_elements(root_elem))
+
+    return new_root_elems
 
 
-class GUIStateManager:
-    activity_name_restore_map = {}
+def is_meaningful_element(elem):
+    if not elem.get('visible', False):
+        return False
 
-    @classmethod
-    def fix_activity_name(cls, activity):
-        original_activity_name = activity
-        activity = activity.split('.')[-1]
-        # if activity.startswith('.'):
-        #     activity = f'{agent_config.package_name}.{activity[1:]}'
-        if activity.endswith('}'):
-            activity = activity[:-1]
-        if activity.endswith('Activity'):
-            activity = activity.removesuffix('Activity')
-        elif activity.endswith('activity'):
-            activity = activity.removesuffix('activity')
+    if not elem.get('enabled', False):
+        return False
+    
+    if elem.get('package') == 'com.android.documentsui': # hotfix for DocumentsUI (removed screenshot files are cached)
+        file_picker_elem_text = elem.get('text')
+        if file_picker_elem_text is not None:
+            file_picker_elem_text = file_picker_elem_text.strip()
+            if file_picker_elem_text.startswith('screen_') and file_picker_elem_text.endswith('.png'):
+                elem['children'] = []
+                del elem['text']
+                return False
 
-        if activity not in cls.activity_name_restore_map:
-            cls.activity_name_restore_map[activity] = original_activity_name
+        file_picker_elem_content_desc = elem.get('content_description')
+        if file_picker_elem_content_desc is not None and 'Photo taken on' in file_picker_elem_content_desc:
+            elem['children'] = []
+            del elem['content_description']
+            return False
 
-        return activity
+        if elem.get('resource_id') == 'android:id/title':
+            elem['clickable'] = True
+            return True
 
+    if any(elem.get(property_name, False) for property_name in ['clickable', 'long_clickable', 'editable', 'scrollable', 'checkable']):
+        return True 
+    if elem.get('text') is not None and len(elem['text'].strip()) > 0:
+        return True
+
+    return False
+
+def traverse_widgets(elem, widget_list, view_list):
+    new_elem = OrderedDict()
+    possible_action_types = []
+    state_properties = []
+
+    if elem.get('clickable', False) or elem.get('checkable', False):
+        possible_action_types.append('touch')
+    if elem.get('long_clickable', False):
+        possible_action_types.append('long_touch')
+    if elem.get('editable', False):
+        possible_action_types.append('set_text')
+    if elem.get('scrollable', False):
+        possible_action_types.append('scroll')
+
+    if elem.get('focused', False):
+        state_properties.append('focused')
+    if elem.get('checked', False):
+        state_properties.append('checked')
+    if elem.get('selected', False):
+        state_properties.append('selected')
+
+    if 'temp_id' in elem and len(possible_action_types) > 0:
+        elem_ID = elem['temp_id']
+        new_elem['ID'] = elem_ID
+        new_elem['view_str'] = view_list[elem_ID]['view_str']
+    if 'class' in elem:
+        new_elem['widget_type'] = elem['class'].split('.')[-1]
+        new_elem['class'] = elem['class']
+    if 'text' in elem and elem['text'] is not None and len(elem['text'].strip()) > 0:
+        new_elem['text'] = elem['text'] if len(elem['text']) < 100 else elem['text'][:100] + '[...]'
+    if 'content_description' in elem and elem['content_description'] is not None:
+        new_elem['content_description'] = elem['content_description']
+    if 'resource_id' in elem and elem['resource_id'] is not None:
+        new_elem['resource_id'] = elem['resource_id'].split('/')[-1]
+    if 'is_password' in elem and elem['is_password']:
+        new_elem['is_password'] = True
+    if len(state_properties) > 0:
+        new_elem['state'] = state_properties
+    if len(possible_action_types) > 0:
+        new_elem['possible_action_types'] = possible_action_types
+
+    if 'view_str' in elem:
+        new_elem['view_str'] = elem['view_str']
+
+    new_elem['bounds'] = elem['bounds']
+
+    children_widgets = []
+    for child in elem.get('children', []):
+        children_widgets.append(traverse_widgets(child, widget_list, view_list))
+    
+    new_elem['children'] = children_widgets
+
+    widget = Widget().from_dict(new_elem)
+    
+    widget_list.append(widget)
+
+    return widget
+
+def prune_elements(json_data):
+    if is_meaningful_element(json_data):
+        # If the current node is interactable or has a text property, recursively prune its children
+        if "children" in json_data and isinstance(json_data["children"], list):
+            new_children = []
+            for child in json_data["children"]:
+                new_children.extend(prune_elements(child))
+            json_data["children"] = new_children
+        return [json_data]
+    else:
+        # If the current node either is not interactable or doesn't have a text property, recursively prune its children and lift them
+        if "children" in json_data:
+            lifted_children = []
+            for child in json_data["children"]:
+                lifted_children.extend(prune_elements(child))
+            return lifted_children
+        return []
+
+def additionally_prune_elements(json_data):
+    # if the current node has only one child that doesn't have any children, lift the child
+    if len(json_data.get('children', [])) == 1 and len(json_data['children'][0].get('children', [])) == 0:
+        only_child = json_data['children'][0]
+        if any(only_child.get(property_name, False) for property_name in ['clickable', 'long_clickable', 'editable', 'scrollable', 'checkable']):
+            return [json_data]
+
+        if only_child.get('text') is not None and len(only_child['text'].strip()) > 0 and json_data.get('text') is None:
+            json_data['text'] = only_child['text']
+            json_data['children'] = []
+
+    return [json_data]
 
 class GUIState:
     def __init__(self):
@@ -34,88 +152,24 @@ class GUIState:
         self.droidbot_state = None
         self.activity_stack = []
         self.possible_actions = []
-        self.interactable_widgets = []
-        self.non_interactable_widgets = []
-        self.actiontype2widgets = defaultdict(dict)
-
-    @property
-    def widgets(self):
-        return self.interactable_widgets + self.non_interactable_widgets
+        self.lost_messages = set()
+        self.logger = logging.getLogger('agent')
 
     def from_droidbot_state(self, droidbot_state):
         """
         Convert the view tree and view list from DroidBot to a GUI state
         :param _view_tree: dict, the view tree from DroidBot
         """
-        _view_tree = droidbot_state.to_dict()
         self.droidbot_state = droidbot_state
         self.activity = GUIStateManager.fix_activity_name(droidbot_state.foreground_activity)
         self.activity_stack = droidbot_state.activity_stack
-        self.tag = _view_tree['tag']
-        _view_list = _view_tree['views']
-        visible_widgets = get_visible_widgets(_view_list)
-        interactable_widgets = get_interactable_widgets(visible_widgets)
-        
-        widget_reprs = {}
-        has_textfield = False
-        used_view_ids = set()
+        self.tag = droidbot_state.tag
+        view_tree = minimize_view_tree(droidbot_state.view_tree)
 
-        # Add interactable widgets and their surrounding context, and register possible actions
-        for view_id, possible_action_types in interactable_widgets.items():
-            view_dict = visible_widgets[view_id]
-            assert view_id == view_dict['temp_id'], 'View ID mismatch'
-
-            text_description, visited_ids = get_description_w_context(view_dict, visible_widgets)
-            used_view_ids = used_view_ids.union(visited_ids)
-
-            if view_dict['class'].endswith('RecyclerView') or view_dict['class'].endswith('ListView'):
-                contained_items = []
-
-                for item in view_dict['children']:
-                    if item not in visible_widgets:
-                        continue
-                    if len(contained_items) > 3:
-                        break
-                    item_description = get_description(visible_widgets[item], visible_widgets, consider_resource_id=False)
-                    if len(item_description) > 0 and 'text' in item_description and len(item_description['text']) > 0:
-                        contained_items.append(item_description['text'][0])
-                if len(contained_items) > 0:
-                    text_description['contained_items'] = contained_items
-
-            w = Widget(view_dict, text_description)
-            if str(w) in widget_reprs:
-                continue
-            
-            widget_reprs[str(w)] = True
-
-            self.interactable_widgets.append(w)
-
-            for action_type in possible_action_types:
-                possible_actions = w.register_possible_actions(action_type)
-                self.possible_actions.extend(possible_actions)
-                self.actiontype2widgets[action_type][w.view_id] = w
-                if action_type == 'set_text':
-                    has_textfield = True
-        
-        if len(self.possible_actions) > 0:
-            # self.possible_actions.append(initialize_screen_scroll_action())
-            self.possible_actions.append(initialize_go_back_action())
-        if has_textfield:
-            self.possible_actions.append(initialize_enter_key_action())
-
-        # Add visible + textually describable widgets that are not contained in interactable widgets
-        for view_id in visible_widgets:
-            if view_id in used_view_ids:
-                continue
-            
-            view_dict = visible_widgets[view_id]
-            text_description = get_description(view_dict, visible_widgets, consider_children=False, consider_resource_id=False)
-            
-            w = Widget(view_dict, text_description)
-            if str(w) in widget_reprs:
-                continue
-            if len(text_description) > 0:
-                self.non_interactable_widgets.append(w)
+        self.root_widgets = []
+        self.widgets =[]
+        for root_elem in view_tree:
+            self.root_widgets.append(traverse_widgets(root_elem, self.widgets, droidbot_state.views))
 
         return self
     
@@ -135,579 +189,434 @@ class GUIState:
         :param view_id: int, the view ID
         :return: Widget, the widget with the given view ID
         """
-        for widget in self.interactable_widgets:
+        for widget in self.widgets:
             if widget.view_id == view_id:
                 return widget
         
-        for widget in self.non_interactable_widgets:
-            if widget.view_id == view_id:
-                return widget
+        return None
 
+    def get_widget_by_signature(self, signature):
+        """
+        Get the widget with the given signature
+        :param signature: str, the signature
+        :return: Widget, the widget with the given signature
+        """
+        for widget in self.widgets:
+            if widget.signature == signature:
+                return widget
+        
         return None
 
     def __str__(self):
         return self.describe_screen()
 
-
-    def describe_screen_w_memory(self, memory, length_limit=6000, mode='NL', show_id=True, use_memory=True, prompt_recorder=None): # mode: 'jsonl' or 'NL'
+    def describe_screen_w_memory(self, memory, length_limit=CONTEXT_LENGTH_LIMIT, show_id=True, during_task=False, prompt_recorder=None, include_widget_knowledge=True):
         """
         From a given GUI state, creates a description of the GUI state including the list of interactable widgets and non-interactable widgets
         """
-        screen_description = ''
+        get_performed_actions_func = memory.get_performed_action_types_on_widget
+        action_count_key = 'num_prev_actions'
 
-        if mode == 'jsonl':
-            interactable_widgets = sorted(self.interactable_widgets, key=lambda x: x.position)
-            non_interactable_widgets = sorted(self.non_interactable_widgets, key=lambda x: x.position)
-            
-            json_str_interactable = ''
-            json_str_non_interactable = ''
-            for widget in interactable_widgets:
-                widget_info = widget.to_dict()
-                if not show_id:
-                    del widget_info['ID']
-                
-                if use_memory:
-                    performed_action_types = memory.get_performed_action_types_on_widget(widget.signature)
-                    if len(performed_action_types) > 0:
-                        widget_info['performed_action_type_count'] = performed_action_types
+        def inject_widget_knowledge(widget, show_id):
+            widget_info = widget.to_dict(include_id=show_id)
 
-                        widget_knowledge = memory.retrieve_widget_knowledge_by_state(self.activity, widget, prompt_recorder=prompt_recorder)
-                        if widget_knowledge is not None:
-                            widget_info['widget_role_inference'] = widget_knowledge
-                
-                json_str_interactable += json.dumps(widget_info, ensure_ascii=False)
-                json_str_interactable += '\n'
-            
-            for widget in non_interactable_widgets:
-                widget_info = widget.to_dict()
-                del widget_info['ID']
+            if ('Main' in memory.current_activity or memory.current_activity == agent_config.main_activity) and 'content_description' in widget_info:
+                # If "Navigate up" widget is in the main page, change its name to "Menu"
+                if widget_info['content_description'].lower() == 'navigate up':
+                    widget_info['content_description'] = 'Menu'
 
-                json_str_non_interactable += json.dumps(widget_info, ensure_ascii=False)
-                json_str_non_interactable += '\n'
-            
-            json_str = f'''
-Interactable widgets:
-{json_str_interactable.strip()}
+            # merge textview children
+            text_only_children = [child for child in widget.children if child.widget_type == 'TextView' and len(child.children) == 0 and len(child.possible_action_types) == 0 and child.text is not None]
 
-Non-interactable widgets:
-{json_str_non_interactable.strip()}
-            '''.strip()
+            children_merged = len(text_only_children) > 0 and len(text_only_children) == len(widget.children) and widget.text is None
 
-            screen_description = json_str.strip()
+            if children_merged:
+                # all children are textviews and it does not have text property
+                widget_info['text'] = [child.text for child in text_only_children if child.text is not None]
+                if len(widget_info['text']) == 0:
+                    del widget_info['text']
 
-        elif mode == 'NL':
-            screen_description = self.describe_screen_NL()
+            if len(widget.possible_action_types) > 0:
+                performed_action_types = get_performed_actions_func(self.activity, widget.signature)
+                interaction_count = 0
+                for action_type in performed_action_types:
+                    interaction_count += performed_action_types[action_type]
 
+                widget_info[action_count_key] = interaction_count
+
+                if include_widget_knowledge and memory.get_widget_knowledge(self.activity, widget.signature) is not None:
+                    widget_knowledge = memory.retrieve_widget_knowledge_by_state(self.activity, widget, prompt_recorder=prompt_recorder)
+                    if widget_knowledge is not None:
+                        widget_info['widget_role_inference'] = widget_knowledge
+
+            children_w_knowledge = []
+
+            if not children_merged:
+                for child in widget.children:
+                    children_w_knowledge.append(inject_widget_knowledge(child, show_id))
+
+            if 'children' in widget_info:
+                del widget_info['children']
+            if len(children_w_knowledge) > 0:
+                widget_info['children'] = children_w_knowledge
+            return widget_info
+
+        page_count_key = 'page_visit_count'
+        if self.activity not in agent_config.app_activities:
+            page_count = '[current page does not belong to the app; just use the page as an intermediate step to accomplish the task]'
         else:
-            raise NotImplementedError(f'Unknown GUI description mode: {mode} (should be either json or NL)')
+            page_count = memory.visited_activities[self.activity]
+        view_hierarchy = {
+            'page_name': self.activity,
+            page_count_key: page_count,
+            'children': []
+        }
+        for widget in self.root_widgets:
+            view_hierarchy['children'].append(inject_widget_knowledge(widget, show_id))
+
+        screen_description = json.dumps(view_hierarchy, indent=2, ensure_ascii=False)
 
         if length_limit and len(screen_description) > length_limit:
             screen_description = screen_description[:length_limit] + '[...truncated...]'
-            # FIXME: let the model first see the excerpt of the screen description and further call functions to see additional details
-
+            self.logger.warning(f'Screen description is too long ({len(screen_description)} > {length_limit}). Truncated. (state tag: {self.tag}))')
+        
+        screen_description = remove_quotes(screen_description) # remove all quotes to reduce the number of tokens
         return screen_description
     
+    def describe_screen(self, length_limit=CONTEXT_LENGTH_LIMIT, show_id=True):
+        view_hierarchy = {
+            'page_name': self.activity,
+            'children': []
+        }
 
-    def describe_screen(self, length_limit=6000, mode='NL', show_id=True): # mode: 'jsonl' or 'NL'
-        """
-        From a given GUI state, creates a description of the GUI state including the list of interactable widgets and non-interactable widgets
-        """
-        screen_description = ''
+        for widget in self.root_widgets:
+            view_hierarchy['children'].append(widget.to_dict(include_id=show_id))
 
-        if mode == 'jsonl':
-            interactable_widgets = sorted(self.interactable_widgets, key=lambda x: x.position)
-            non_interactable_widgets = sorted(self.non_interactable_widgets, key=lambda x: x.position)
-            
-            json_str_interactable = ''
-            json_str_non_interactable = ''
-            for widget in interactable_widgets:
-                widget_info = widget.to_dict()
-                if not show_id:
-                    del widget_info['ID']
-                
-                json_str_interactable += json.dumps(widget_info, ensure_ascii=False)
-                json_str_interactable += '\n'
-            
-            for widget in non_interactable_widgets:
-                widget_info = widget.to_dict()
-                del widget_info['ID']
-
-                json_str_non_interactable += json.dumps(widget_info, ensure_ascii=False)
-                json_str_non_interactable += '\n'
-            
-            json_str = f'''
-Interactable widgets:
-{json_str_interactable.strip()}
-
-Non-interactable widgets:
-{json_str_non_interactable.strip()}
-            '''.strip()
-
-            screen_description = json_str.strip()
-
-        elif mode == 'NL':
-            screen_description = self.describe_screen_NL()
-
-        else:
-            raise NotImplementedError(f'Unknown GUI description mode: {mode} (should be either json or NL)')
+        screen_description = json.dumps(view_hierarchy, indent=2, ensure_ascii=False)
 
         if length_limit and len(screen_description) > length_limit:
             screen_description = screen_description[:length_limit] + '[...truncated...]'
-            # FIXME: let the model first see the excerpt of the screen description and further call functions to see additional details
+            self.logger.warning(f'Screen description is too long ({len(screen_description)} > {length_limit}). Truncated. (state tag: {self.tag}))')
 
+        screen_description = remove_quotes(screen_description) # remove all double quotes to reduce the number of tokens
         return screen_description
 
-    def describe_screen_NL(self):
+    def describe_widgets(self, length_limit=CONTEXT_LENGTH_LIMIT, show_id=True):
+        desc = ''
+
+        for widget in self.widgets:
+            desc += widget.dump(indent=None) + '\n'
+        
+        desc = desc.strip()
+
+        if length_limit and len(desc) > length_limit:
+            desc = desc[:length_limit] + '[...truncated...]'
+            self.logger.warning(f'Screen description is too long ({len(screen_description)} > {length_limit}). Truncated. (state tag: {self.tag}))')
+        
+        return desc
+
+    def describe_widgets_NL(self, length_limit=CONTEXT_LENGTH_LIMIT):
+        desc = ''
+
+        for widget in self.widgets:
+            desc += widget.stringify(include_children_text=False) + '\n'
+        
+        desc = desc.strip()
+
+        if length_limit and len(desc) > length_limit:
+            desc = desc[:length_limit] + '[...truncated...]'
+            self.logger.warning(f'Screen description is too long ({len(desc)} > {length_limit}). Truncated. (state tag: {self.tag}))')
+        
+        return desc
+
+    def diff(self, other):
         """
-        natural language representation of the GUI state
+        Calculate the difference between two GUI states
         """
-        widgets = sorted(self.interactable_widgets + self.non_interactable_widgets, key=lambda x: x.position)
-        # gui_state = 'There are following widgets on this screen: '
-        gui_state = '{self.activity} page: '
-        if len(widgets) == 0:
-            return 'There are no widgets on this screen.'
-        for widget in widgets:
-            gui_state += f'{widget.stringify()}, '
-        for widget in self.non_interactable_widgets:
+        diff = difflib.ndiff(self.describe_widgets().splitlines(keepends=True), other.describe_widgets().splitlines(keepends=True))
+        return ''.join(diff)
+
+    def diff_widgets(self, other):
+        changed_widgets = []
+        appeared_widgets = []
+        disappeared_widgets = []
+
+        old_widgets = {}
+        new_widgets = {}
+
+        for w in self.widgets:
+            if w.signature is None:
+                continue
+            key = w.signature
+            old_widgets[key] = w
+
+        for w in other.widgets:
+            if w.signature is None:
+                continue
+            key = w.signature
+            new_widgets[key] = w
+
+            if key not in old_widgets:
+                appeared_widgets.append(w)
+            else:
+                old_w = old_widgets[key]
+                if old_w.elem_dict.get('state', []) != w.elem_dict.get('state', []):
+                    changed_widgets.append((w, {
+                        'old_state': old_w.elem_dict.get('state', []),
+                        'new_state': w.elem_dict.get('state', [])
+                    }))
+                elif old_w.elem_dict.get('text', '') != w.elem_dict.get('text', ''):
+                    old_text = old_w.elem_dict.get('text', '')
+                    new_text = w.elem_dict.get('text', '')
+                    changed_widgets.append((w, {
+                        'old_text': old_text,
+                        'new_text': new_text
+                    }))
+                    
+        for key in old_widgets:
+            if key not in new_widgets:
+                disappeared_widgets.append(old_widgets[key])
+
+        return changed_widgets, appeared_widgets, disappeared_widgets
+
+
+    @cached_property
+    def signature(self):
+        """
+        natural language representation of the GUI state (used as a query for associative memory)
+        """
+        gui_state = f'{self.activity} page: '
+        for widget in self.widgets:
             gui_state += f'{widget.stringify()}, '
         return gui_state[:-2]
 
-    def describe_possible_actions(self, show_widget_id=False):
-        description = ''
-        for i, possible_action in enumerate(self.possible_actions):
-            description += f'[Action ID: {i}] {possible_action.get_possible_action_str(show_widget_id=show_widget_id)}\n'
+    @cached_property
+    def actiontype2widgets(self):
+        actiontype2widgets = defaultdict(dict)
+        for w in self.widgets:
+            for action_type in w.possible_action_types:
+                assert w.view_id is not None, 'interactable widgets must have view ID'
+                actiontype2widgets[action_type][w.view_id] = w
+        
+        return actiontype2widgets
 
-        return description.strip()
+    @cached_property
+    def interactable_widget_ids(self):
+        interactable_widget_ids = set()
+        for w in self.widgets:
+            if len(w.possible_action_types) > 0:
+                interactable_widget_ids.add(w.view_id)
+        return interactable_widget_ids
 
 
 class Widget:
-    def __init__(self, view_dict, text_description):
-        self.view_id = view_dict['temp_id']
-        self._class = view_dict['class']
-        self.position = (view_dict['bounds'][0][1], view_dict['bounds'][0][0])
-        self.is_password = True if 'is_password' in view_dict and view_dict['is_password'] else False
-        self.contained_items = None
-        self.view_dict = view_dict
-
-        self.widget_description = None
+    def __init__(self):
+        self.view_id = None
+        self.widget_type = None
         self.possible_action_types = []
-        self.possible_actions = []
 
-        self.state_properties = []
+    def from_dict(self, elem_dict):
+        self.view_id = elem_dict.get('ID', None)
+        self.widget_type = elem_dict['widget_type']
+        self.possible_action_types = elem_dict.get('possible_action_types', [])
+        self.children = elem_dict.get('children', [])
+
+        if 'children' in elem_dict:
+            del elem_dict['children']
         
-        for state_property in ['focused', 'checked', 'selected']:
-            if state_property in view_dict and view_dict[state_property]:
-                self.state_properties.append(state_property)
-                
-        self.load_widget_description(text_description)
-        self.signature = f'{self._class}-{self.stringify(include_modifiable_properties=False)}'
+        self.elem_dict = elem_dict
 
-    def to_dict(self):
-        description = {
-            'ID': self.view_id,
-            'widget_type': self._class,
-        }
+        return self
 
-        if self.widget_description is not None:
-            if 'text' in self.widget_description:
-                description['text'] = self.widget_description['text']
-            if 'adjacent_text' in self.widget_description:
-                description['adjacent_text'] = self.widget_description['adjacent_text']
-            if 'content_description' in self.widget_description:
-                description['content_description'] = self.widget_description['content_description']
-            if 'resource_id' in self.widget_description:
-                description['resource_id'] = self.widget_description['resource_id']
-                
-            # description['description'] = self.widget_description
+    def to_dict(self, include_id=True, only_rep_property=True):
+        children = [child.to_dict(include_id=include_id) for child in self.children]
+        elem_dict = copy.deepcopy(self.elem_dict)
+
+        del elem_dict['class']
+        del elem_dict['bounds']
+        if not include_id and 'ID' in elem_dict:
+            del elem_dict['ID']
+
+        if only_rep_property:
+            if 'text' in elem_dict:
+                if 'resource_id' in elem_dict:
+                    del elem_dict['resource_id']
+                if 'content_description' in elem_dict:
+                    del elem_dict['content_description']
+            
+        if 'view_str' in elem_dict:
+            del elem_dict['view_str']
+
+        if len(children) > 0:
+            elem_dict['children'] = children
+
+        return elem_dict
+
+    @cached_property
+    def bounds(self):
+        return self.elem_dict['bounds']
         
-        if self.is_password:
-            description['is_password'] = True
+    @cached_property
+    def text(self):
+        return self.elem_dict.get('text', None)
 
-        if self.contained_items is not None:
-            description['contained_items'] = self.contained_items
+    @cached_property
+    def resource_id(self):
+        return self.elem_dict.get('resource_id', None)
 
-        if len(self.state_properties) > 0:
-            description['state'] = self.state_properties
+    @cached_property
+    def content_description(self):
+        return self.elem_dict.get('content_description', None)
 
-        if len(self.possible_action_types) > 0:
-            description['possible_action_types'] = self.possible_action_types
+    @cached_property
+    def all_text(self):
+        texts = []
+        if self.text is not None and len(self.text.strip()) > 0:
+            if len(self.text) > 50:
+                texts.append(self.text[:50] + '[...]')
+            else:
+                texts.append(self.text)
 
-        return description
+        for child in self.children:
+            texts.extend(child.all_text)
+        
+        return texts
 
-    def register_possible_actions(self, action_type):
-        possible_actions = initialize_possible_actions(action_type, self)
-        if action_type not in self.possible_action_types:
-            self.possible_action_types.append(action_type)
-        self.possible_actions.extend(possible_actions)
-        return possible_actions
+    @cached_property
+    def state(self):
+        return self.elem_dict.get('state', [])
 
-    def load_widget_description(self, text_description):
-        content_description = []
-        text = []
-        adjacent_text = []
-        resource_id = []
+    @cached_property
+    def signature(self):
+        immutable_props = ['content_description', 'resource_id']
+        if 'set_text' not in self.possible_action_types:
+            immutable_props.append('text')
 
-        if 'content_description' in text_description:
-            content_description = text_description['content_description']
-        if 'text' in text_description:
-            text = text_description['text']
-        if 'resource_id' in text_description:
-            resource_id = text_description['resource_id']
-            resource_id = [rid.split('/')[-1] for rid in resource_id]
-        if 'contained_items' in text_description:
-            self.contained_items = text_description['contained_items']
+        ingredients = []
+        for prop in immutable_props:
+            if prop in self.elem_dict and self.elem_dict[prop] is not None and len(self.elem_dict[prop].strip()) > 0:
+                ingredients.append(self.elem_dict[prop])
+        
+        # also use concatenated children's signature
+        ingredients.extend([child.signature for child in self.children])
 
-        if 'parent' in text_description:
-            parent_desc = text_description['parent']
-            if len(text) == 0 and 'text' in parent_desc:
-                adjacent_text.extend(parent_desc['text'])
-            # if content_description is None and 'content_description' in parent_desc:
-            #     content_description = parent_desc['content_description']
-            # if resource_id is None and 'resource_id' in parent_desc:
-            #     resource_id = parent_desc['resource_id']
+        if len(ingredients) == 0:
+            # non-describable widget...
+            ingredients = [str(self.elem_dict['bounds'])]
 
-        if 'siblings' in text_description:
-            siblings_desc = text_description['siblings']
-            if 'text' in siblings_desc:
-                adjacent_text.extend(siblings_desc['text'])
-            # if content_description is None and 'content_description' in siblings_desc:
-            #     content_description = siblings_desc['content_description']
-            # if resource_id is None and 'resource_id' in siblings_desc:
-            #     resource_id = siblings_desc['resource_id']
+        ingredients.insert(0, self.widget_type)
 
-        if len(text) > 0 or len(adjacent_text) > 0 or len(content_description) > 0 or len(resource_id) > 0:
-            self.widget_description = {}
-
-        if len(text) > 0:
-            if len(text) == 1:
-                text = text[0]
-            elif len(text) > 5:
-                text = text[:5] + ['...']
-            self.widget_description['text'] = text
-
-        if len(adjacent_text) > 0:
-            if len(adjacent_text) == 1:
-                adjacent_text = adjacent_text[0]
-            elif len(adjacent_text) > 5:
-                adjacent_text = adjacent_text[:5] + ['...']
-            self.widget_description['adjacent_text'] = adjacent_text
-
-        if len(content_description) > 0:
-            if len(content_description) == 1:
-                content_description = content_description[0]
-            elif len(content_description) > 5:
-                content_description = content_description[:5] + ['...']
-            self.widget_description['content_description'] = content_description
-
-        if len(resource_id) > 0:
-            if len(resource_id) == 1:
-                resource_id = resource_id[0]
-            elif len(resource_id) > 5:
-                resource_id = resource_id[:5] + ['...']
-            self.widget_description['resource_id'] = resource_id
+        return '-'.join(ingredients)
 
     def __repr__(self):
-        """
-        From a given widget, creates a (detailed) description of the widget including its type, resource ID, text, and content description, and possible action types
-        {
-            ID: 1,
-            widget_type: "TextView",
-            description: {
-                text: "hello world",
-                content_description: "hello world",
-                resource_id: "com.example.app:id/hello_world",
-            }
-            possible_action_types: "touch, scroll, set_text"
-        }
-        """
-        description = self.to_dict()
-        
-        return json.dumps(description, indent=2, ensure_ascii=False)
+        return self.dump()
 
     def __str__(self):
         return self.stringify()
 
-    def stringify(self, include_modifiable_properties=True):
+    def dump(self, indent=2):
+        """
+        Stringify the widget including its children
+        {
+            "ID": 10,
+            "widget_type": "Spinner",
+            "resource_id": "com.ichi2.anki:id/toolbar_spinner",
+            "possible_action_types": [
+                "touch",
+                "long_touch",
+                "scroll"
+            ],
+            "children": [
+                {
+                "widget_type": "TextView",
+                "text": "My Filtered Deck",
+                "resource_id": "com.ichi2.anki:id/dropdown_deck_name"
+                },
+                {
+                "widget_type": "TextView",
+                "text": "6 cards shown",
+                "resource_id": "com.ichi2.anki:id/dropdown_deck_counts"
+                }
+            ]
+        }
+        """
+        return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
+
+    def stringify(self, include_children_text=True):
         """
         natural language description of the widget
         """
-        # maybe we can use LLM to summarise the widget info as well? 
-        widget_type = self._class
+        widget_type = self.widget_type
+        widget_desc = ''
 
-        if len(self.state_properties) > 0 and include_modifiable_properties:
-            state = ', '.join(self.state_properties)
-            widget_type_repr = f'{state} '
-        else:
-            widget_type_repr = ''
+        if len(self.state) > 0:
+            state = ', '.join(self.state)
+            widget_desc = f'{state} '
 
-        if self.is_password:
-            widget_type_repr += 'password textfield'
+        if self.elem_dict.get('is_password', False):
+            widget_desc += 'password textfield'
         
         elif 'EditText' in widget_type:
-            widget_type_repr += 'textfield'
+            widget_desc += 'textfield'
         elif 'Button' in widget_type:
-            widget_type_repr += 'button'
+            widget_desc += 'button'
         elif 'CheckBox' in widget_type:
-            widget_type_repr += 'checkbox'
+            widget_desc += 'checkbox'
         elif 'RadioButton' in widget_type:
-            widget_type_repr += 'radio button'
+            widget_desc += 'radio button'
         elif 'Spinner' in widget_type:
-            widget_type_repr += 'dropdown field'
+            widget_desc += 'dropdown field'
         elif widget_type.endswith('Tab'):
-            widget_type_repr += 'tab'
+            widget_desc += 'tab'
         
         else:
             if 'touch' in self.possible_action_types:
-                widget_type_repr += 'button'
+                widget_desc += 'button'
             elif 'scroll' in self.possible_action_types:
-                widget_type_repr += 'scrollable area'
+                widget_desc += 'scrollable area'
             elif 'set_text' in self.possible_action_types:
-                widget_type_repr += 'textfield'
+                widget_desc += 'textfield'
             elif 'TextView' in widget_type:
-                widget_type_repr += 'textview'
+                widget_desc += 'textview'
             elif 'ImageView' in widget_type:
-                widget_type_repr += 'imageview'
+                widget_desc += 'imageview'
             elif 'LinearLayout' in widget_type:
-                widget_type_repr += 'linearlayout'
+                widget_desc += 'linearlayout'
             elif 'RelativeLayout' in widget_type:
-                widget_type_repr += 'relativelayout'
+                widget_desc += 'relativelayout'
             elif 'FrameLayout' in widget_type:
-                widget_type_repr += 'framelayout'
+                widget_desc += 'framelayout'
             elif 'GridLayout' in widget_type:
-                widget_type_repr += 'gridlayout'
+                widget_desc += 'gridlayout'
             elif 'RecyclerView' in widget_type:
-                widget_type_repr += 'recyclerview'
+                widget_desc += 'recyclerview'
             elif 'ListView' in widget_type:
-                widget_type_repr += 'listview'
+                widget_desc += 'listview'
             else:
-                widget_type_repr += 'widget'
+                widget_desc += 'widget'
         
-        widget_type_repr = 'an ' + widget_type_repr if widget_type_repr[0] in ['a', 'e', 'i', 'o', 'u'] else 'a ' + widget_type_repr
+        widget_desc = 'an ' + widget_desc if widget_desc[0] in ['a', 'e', 'i', 'o', 'u'] else 'a ' + widget_desc
 
-        text = None
-        content_description = None
-        resource_id = None
-
-        if self.widget_description is not None:
-            text = self.widget_description.get('text', None)
-            content_description = self.widget_description.get('content_description', None)
-            resource_id = self.widget_description.get('resource_id', None)
+        if include_children_text:
+            if len(self.all_text) > 3:
+                text = ', '.join(self.all_text[:3]) + f'[...and more]'
+            else:
+                text = ", ".join(self.all_text) if len(self.all_text) > 0 else None
+        else:
+            text = self.text
+        content_description = self.elem_dict.get('content_description', None)
+        resource_id = self.elem_dict.get('resource_id', None)
 
         text_desc = []
-        include_text_property = False
-        if 'set_text' not in self.possible_action_types:
-            include_text_property = True
-        if include_modifiable_properties:
-            include_text_property = True
-        if text is not None and include_text_property:
-            if isinstance(text, list):
-                text = [f'"{t}"' for t in text]
-                if text[-1] == '"..."':
-                    text[-1] = '...'
-                text_desc.append(f'texts {", ".join(text)}')
-            else:
-                text_desc.append(f'text "{text}"')
-        if self.contained_items is not None and include_modifiable_properties:
-            contained_items = [f'"{i}"' for i in self.contained_items]
-            text_desc.append(f'contained items such as {", ".join(contained_items)}')
-
-        if content_description is not None:
-            if isinstance(content_description, list):
-                content_description = [f'"{t}"' for t in content_description]
-                if content_description[-1] == '"..."':
-                    content_description[-1] = '...'
-                text_desc.append(f'content_descs {", ".join(content_description)}')
-            else:
-                text_desc.append(f'content_desc "{content_description}"')
-        if resource_id is not None:
-            if isinstance(resource_id, list):
-                resource_id = [f'"{t}"' for t in resource_id]
-                if resource_id[-1] == '"..."':
-                    resource_id[-1] = '...'
-                text_desc.append(f'resource_ids {", ".join(resource_id)}')
-            else:
-                text_desc.append(f'resource_id "{resource_id}"')
+        if text is not None:
+            text_desc.append(f'text "{text}"')
+        elif content_description is not None:
+            text_desc.append(f'content_desc "{content_description}"')
+        elif resource_id is not None:
+            text_desc.append(f'resource_id "{resource_id}"')
 
         if len(text_desc) > 0:
             text_desc = ' and '.join(text_desc)
-            return f'{widget_type_repr} that has {text_desc}'
+            return f'{widget_desc} that has {text_desc}'
         
-        return widget_type_repr
-
-
-def get_visible_widgets(view_list):
-    visible_widgets = {}
-    for view_id, view_dict in enumerate(view_list):
-        if view_dict['visible']:
-            visible_widgets[view_id] = view_dict
-    return visible_widgets
-
-def get_all_parent_ids(view_dict, visible_widgets):
-    parent_ids = []
-    cur_view_dict = view_dict
-    while 'parent' in cur_view_dict and cur_view_dict['parent'] > 0:
-        parent_ids.append(cur_view_dict['parent'])
-        if cur_view_dict['parent'] not in visible_widgets:
-            break
-        cur_view_dict = visible_widgets[cur_view_dict['parent']]
-    return parent_ids
-
-def get_interactable_widgets(visible_widgets):
-    interactable_widgets = defaultdict(list)
-    touch_exclude_view_ids = []
-    # Exclude parents of clickable widgets from being interactable
-
-    for view_id, view_dict in visible_widgets.items():
-        if 'enabled' not in view_dict:
-            continue
-        if 'enabled' in view_dict and not view_dict['enabled']:
-            continue
-        if view_dict['clickable'] or view_dict['checkable']:
-            touch_exclude_view_ids.extend(get_all_parent_ids(view_dict, visible_widgets))
-
-    touch_exclude_view_ids = set(touch_exclude_view_ids)
-
-    for view_id, view_dict in visible_widgets.items():
-        if 'enabled' in view_dict and not view_dict['enabled']:
-            continue
-        if view_dict['clickable'] or view_dict['checkable']:
-            if not view_id in touch_exclude_view_ids:
-                interactable_widgets[view_id].append('touch')
-        if view_dict['long_clickable']:
-            interactable_widgets[view_id].append('long_touch')
-        if view_dict['scrollable']:
-            interactable_widgets[view_id].append('scroll')
-        if view_dict['editable']:
-            if view_dict['class'].endswith('Spinner'):
-               pass
-            else:
-                interactable_widgets[view_id].append('set_text')
-
-    return interactable_widgets
-
-
-def get_description(view_dict, visible_widgets, consider_children=True, consider_resource_id=True):
-    description = defaultdict(list)
-
-    text_content = None
-    if 'text' in view_dict and view_dict['text'] is not None:
-        text_content = view_dict['text'][:50] + '[...]' if len(view_dict['text']) > 50 else view_dict['text']
-        text_content = text_content.replace('\n', '<newline>').replace('\r', ' ').replace('\t', ' ')
-
-    if consider_resource_id and 'resource_id' in view_dict and view_dict['resource_id'] is not None:
-        description['resource_id'].append(view_dict['resource_id'])
-    if 'text' in view_dict and text_content is not None and len(text_content.strip()) > 0:
-        description['text'].append(text_content)
-    if 'content_description' in view_dict and view_dict['content_description'] is not None:
-        description['content_description'].append(view_dict['content_description'])
-
-    if has_sufficient_description(view_dict, description):
-        return description
-
-    if consider_children:
-        for child in view_dict['children']:
-            if child not in visible_widgets:
-                continue
-            child_desc = get_description(visible_widgets[child], visible_widgets) 
-            # if consider_resource_id and 'resource_id' in child_desc and child_desc['resource_id'] is not None:
-            #     description['resource_id'].extend(child_desc['resource_id'])
-            if 'text' in child_desc and child_desc['text'] is not None and len(child_desc['text']) > 0:
-                description['text'].extend(child_desc['text'])
-            if 'content_description' in child_desc and child_desc['content_description'] is not None:
-                description['content_description'].extend(child_desc['content_description'])
-
-    return description
-
-def get_all_children_ids(view_dict, visible_widgets):
-    children_ids = set()
-    if 'children' in view_dict:
-        children_ids = children_ids.union(view_dict['children'])
-    for child in view_dict['children']:
-        if child not in visible_widgets:
-            continue
-        children_ids = children_ids.union(get_all_children_ids(visible_widgets[child], visible_widgets))
-    return children_ids
-
-def has_sufficient_description(view_dict, description):
-    if 'ImageButton' in view_dict['class'] or 'ImageView' in view_dict['class']:
-        if 'content_description' in description or 'resource_id' in description:
-            return True
-
-    if 'text' in description or 'content_description' in description:
-        return True
-    if 'parent' in description and 'text' in description['parent']:
-        return True
-    if 'parent' in description and 'content_description' in description['parent']:
-        return True
-    if 'siblings' in description and 'text' in description['siblings']:
-        return True
-    if 'siblings' in description and 'content_description' in description['siblings']:
-        return True
-    
-    return False
-
-def get_description_w_context(view_dict, visible_widgets):
-    description = get_description(view_dict, visible_widgets)
-    visited_ids = {view_dict['temp_id']}
-    if 'children' in view_dict:
-        visited_ids = visited_ids.union(get_all_children_ids(view_dict, visible_widgets))
-    
-    if 'is_password' in view_dict and view_dict['is_password']:
-        description['is_password'] = True
-    if has_sufficient_description(view_dict, description):
-        return description, visited_ids
-    
-    # get parent/sibling descriptions instead
-    cur_view_dict = visible_widgets[view_dict['parent']]
-    while 'parent' in cur_view_dict and cur_view_dict['parent'] > 0:
-        if cur_view_dict['temp_id'] in visited_ids:
-            break
-        parent_desc = get_description(cur_view_dict, visible_widgets, consider_children=True)
-        visited_ids.add(cur_view_dict['temp_id'])
-        if has_sufficient_description(view_dict, parent_desc):
-            description['parent'] = parent_desc
-            break
-
-        siblings_desc = defaultdict(list)
-        for sibling in cur_view_dict['children']:
-            if sibling == cur_view_dict['temp_id']:
-                continue
-            if sibling not in visible_widgets:
-                continue
-            desc = get_description(visible_widgets[sibling], visible_widgets, consider_children=True)
-            visited_ids.add(sibling)
-            if len(desc) > 0:
-                # if 'resource_id' in desc:
-                #     siblings_desc['resource_id'].extend(desc['resource_id'])
-                if 'text' in desc and len(desc['text']) > 0:
-                    siblings_desc['text'].extend(desc['text'])
-                if 'content_description' in desc:
-                    siblings_desc['content_description'].extend(desc['content_description'])
-        if has_sufficient_description(view_dict, siblings_desc):
-            description['siblings'] = siblings_desc
-            break
-
-        else:
-            cur_view_dict = visible_widgets[cur_view_dict['parent']]
-    
-    return description, visited_ids
-
-
-def __safe_dict_get(d, key, default=None):
-    return d[key] if (key in d) else default
-
-
-def __get_all_children(view_dict, views):
-        """
-        Get temp view ids of the given view's children
-        :param view_dict: dict, an element of DeviceState.views
-        :return: set of int, each int is a child node id
-        """
-        children = __safe_dict_get(view_dict, 'children')
-        if not children:
-            return set()
-        children = set(children)
-        for child in children:
-            children_of_child = __get_all_children(views[child], views)
-            children.union(children_of_child)
-        return children
+        return widget_desc

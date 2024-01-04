@@ -4,7 +4,7 @@ import time
 
 from .config import agent_config
 from .action import *
-from .prompts.plan_v3 import *
+from .prompts.plan import *
 
 from collections import defaultdict
 

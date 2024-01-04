@@ -10,7 +10,7 @@ import friendlywords as fw
 from datetime import datetime
 from pathlib import Path
 
-from .gui_state_v2 import GUIState
+from .gui_state import GUIState
 from .memory import Memory
 from .model import stringify_prompt, zip_messages
 from ._observer import Observer
