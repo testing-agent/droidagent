@@ -29,13 +29,13 @@ DroidAgent requires ADB (Android debugging bridge) and several Python libraries 
         ```
 
 * Android device connected or emulator running
-* DroidAgent uses the slightly modified version of [DroidBot](https://github.com/testing-agent/droidbot) (included as submodule)
-* OpenAI key: rename `.openai_api_key.example` to `.openai_api_key` and add your OpenAI API key
+* DroidAgent uses the slightly modified version of [DroidBot](https://github.com/coinse/droidbot) (included as submodule)
+* OpenAI key: rename `.env.example` to `.env` and add your own OpenAI API key
 
 
 ### Clone & Install Dependencies
 ```bash
-$ git clone --recurse-submodule https://github.com/testing-agent/droidagent.git
+$ git clone --recurse-submodule https://github.com/coinse/droidagent.git
 $ cd droidbot
 $ pip install -e . # install droidbot
 $ cd ..
@@ -86,7 +86,7 @@ $ python make_report.py --result_dir [RESULT_DIR] --project [PROJECT_NAME]
 `[RESULT_DIR]` should point to the `[OUTPUT_DIR]` as well.
 The task-by-task markdown report will be generated in the `reports/[PROJECT_NAME]` directory. Each report contains the task description, performed GUI actions, and the observation of the application state after the task execution with screenshots.
 
-[Reports on the evaluation data - published on website (TBD)](https://testing-agent.github.io/droidagent-reports/)
+[Reports on the evaluation data - published on website (TBD)](https://coinse.github.io/droidagent-reports/)
 
 Example of a report:
 ![report](resources/example_report.png)
